@@ -1,0 +1,76 @@
+# Java/Spring Boot
+/target/
+*.iml
+*.class
+*.log
+*.jar
+*.war
+*.ear
+/.idea/
+/.project
+/.classpath
+/.settings/
+/.vscode/
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Node/React
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+*.swp
+
+# 기타
+.env
+*.local
+*.bak
+*.tmp
+
+# Test/coverage
+coverage/
+frontend/coverage/
+
+# Logs
+logs/
+*.log
+
+# Ignore sensitive files
+secrets.*
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/

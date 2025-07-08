@@ -1,0 +1,228 @@
+# 낚시 앱 프로젝트 명세서
+
+## 📋 프로젝트 개요
+
+### 서비스 설명
+사용자가 낚시 후 사진을 찍고 올리면 어종 희귀도와 어종 길이를 계산해서 점수를 구하고, 도감을 모으며 낚시 커뮤니티 기능을 제공하는 서비스
+
+### 주요 기능
+- 낚시 기록 및 점수 계산
+- 물고기 도감 수집 시스템
+- 낚시 커뮤니티 (게시판)
+- 사용자 랭킹 시스템
+
+---
+
+## 🗂️ 데이터베이스 설계
+
+### 1. 사용자 관련 테이블
+
+#### User (사용자)
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 사용자 아이디 (PK) |
+| login_id | Long | 로그인 아이디 |
+| password | String | 비밀번호 |
+
+#### User_Info (사용자 상세정보)
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 사용자 상세정보 아이디 (PK) |
+| name | String | 사용자 이름 |
+| level | Integer | 사용자 레벨 |
+| email | String | 이메일 |
+| phone_number | String | 전화번호 |
+
+### 2. 물고기 관련 테이블
+
+#### Fish (물고기 정보)
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 물고기 아이디 (PK) |
+| name | String | 물고기 이름 |
+| avg_length | Double | 평균 길이 |
+| std_deviation | Double | 표준편차 |
+
+
+
+#### Fish_도감 (물고기 도감)
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 도감 아이디 (PK) |
+| user_id | Long | 사용자 아이디 (FK) |
+| fish_id | Long | 물고기 아이디 (FK) |
+| is_collect | Boolean | 수집 여부 |
+| collect_at | LocalDate | 수집 날짜 |
+| highest_score | Integer | 최고 점수 |
+| highest_length | Integer | 최고 길이 |
+
+
+
+#### Fish_도감_detail (낚시 기록 상세)
+table name: fish_log
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 상세 기록 아이디 (PK) |
+| user_id | Long | 사용자 아이디 (FK) |
+| fish_id | Long | 물고기 아이디 (FK) |
+| collect_at | LocalDate | 낚시 날짜 |
+| length | Double | 물고기 길이 |
+| score | Integer | 획득 점수 |
+| place | String | 낚시 장소 (선택) |
+| review | String | 낚시 후기 (선택) |
+
+
+
+### 3. 커뮤니티 관련 테이블
+
+#### Board (게시판)
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 게시글 아이디 (PK) |
+| user_id | Long | 작성자 아이디 (FK) |
+| create_at | LocalDate | 작성일 |
+| update_at | LocalDate | 수정일 |
+| read_count | Integer | 조회수 |
+| title | String | 제목 |
+| content | String | 내용 |
+
+#### Comment (댓글)
+| 필드명 | 타입 | 설명 |
+|--------|------|------|
+| id | Long | 댓글 아이디 (PK) |
+| user_id | Long | 작성자 아이디 (FK) |
+| board_id | Long | 게시글 아이디 (FK) |
+| create_at | LocalDate | 작성일 |
+| update_at | LocalDate | 수정일 |
+| content | String | 댓글 내용 |
+
+---
+
+## 🛠️ 기술 스택
+
+### Frontend
+- **React** with **TypeScript**
+- **Create React App (CRA)**
+
+### Backend
+- **Spring Boot**
+- **Spring Security** (인증/인가)
+- **JWT Token** 기반 인증
+
+### 인증/인가
+- **Spring Security + JWT Token**
+- 로그인/로그아웃 처리
+- API 접근 권한 제어
+
+---
+
+## 🏆 비즈니스 로직
+
+### 랭킹 시스템
+- 별도 랭킹 테이블 없이 실시간 계산 방식 사용
+- 전체 사용자 랭킹: 총 점수 기준 정렬
+- 특정 어종 랭킹: 해당 어종 최고 점수 기준 정렬
+
+### 점수 계산 시스템
+- 어종 희귀도 기반 점수 계산
+- 어종 길이와 표준편차를 활용한 점수 가중치 적용
+- 평균 길이 대비 상대적 크기로 점수 산출
+
+### 도감 수집 시스템
+- 새로운 물고기 낚시 시 도감 자동 등록
+- 기존 수집 물고기의 경우 최고 기록 갱신
+- 수집 날짜, 최고 점수, 최고 길이 기록 유지
+
+### 데이터 업데이트 로직
+- `fish_도감_detail`에 새 기록 추가 시 `fish_도감`의 최고 기록 비교 업데이트
+- 트랜잭션 처리로 데이터 일관성 보장
+
+---
+
+## 📁 디렉터리 구조
+
+### 도메인 주도 설계 (Domain-Driven Design)
+현재 도메인: `user`, `fish`
+
+### Frontend 구조
+```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── common/          # 공통 컴포넌트
+│   │   ├── user/            # 사용자 관련 컴포넌트
+│   │   └── fish/            # 물고기 관련 컴포넌트
+│   ├── layouts/             # 레이아웃 컴포넌트
+│   │   ├── Header.tsx
+│   │   ├── Footer.tsx
+│   │   └── MainLayout.tsx
+│   ├── pages/               # 페이지 컴포넌트
+│   ├── hooks/               # 커스텀 훅
+│   ├── services/            # API 호출 서비스
+│   ├── utils/               # 유틸리티 함수
+│   └── types/               # TypeScript 타입 정의
+```
+
+### 페이지 구조
+src/
+├── pages/
+│   ├── auth/
+│   │   ├── LoginPage.tsx
+│   │   ├── RegisterPage.tsx
+│   │   └── ForgotPasswordPage.tsx
+│   ├── home/
+│   │   └── HomePage.tsx
+│   ├── fish/
+│   │   ├── FishCollectionPage.tsx
+│   │   │   └── componetns: FishCard, FishCardGrid
+│   │   └── FishLogsPage.tsx
+│   ├── ranking/ 생략
+│   │   └── RankingPage.tsx
+│   ├── community/ 생략
+│   │   ├── CommunityPage.tsx
+│   │   ├── PostDetailPage.tsx
+│   │   └── PostWritePage.tsx
+│   └── profile/
+│       ├── ProfilePage.tsx 생략    
+│       ├── ProfileEditPage.tsx 생략
+|       └── AdminPage.tsx
+│           └── componetns: FishCard, FishCardList (Fish 객체 등록용 C, R, U, D)
+├── layout/
+│   ├── Header.tsx
+│   ├── Footer.tsx
+### Backend 구조
+```
+backend/
+├── src/main/java/
+│   ├── user/                # 사용자 도메인
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── repository/
+│   │   └── entity/
+│   ├── fish/                # 물고기 도메인
+│   │   ├── controller/
+│   │   ├── service/
+│   │   ├── repository/
+│   │   └── entity/
+│   ├── common/              # 공통 기능
+│   └── config/              # 설정 클래스
+```
+
+---
+
+## 📝 개발 고려사항
+
+### 1. 명명 규칙
+- 테이블명: snake_case 통일 권장
+- 컬럼명: snake_case 통일 권장
+
+### 2. 추가 고려사항
+- **사진 저장**: 파일 경로만 DB에, 실제 파일은 클라우드 스토리지
+- **데이터 일관성**: 트랜잭션 처리로 데이터 무결성 보장
+- **API 설계**: RESTful API 설계 원칙 준수
+
+### 3. 확장 가능성
+- 낚시 장소별 통계
+- 날씨 정보 연동
+- 사용자 간 친구 기능
+- 낚시 대회 기능
