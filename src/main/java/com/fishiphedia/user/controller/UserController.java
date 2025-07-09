@@ -2,6 +2,7 @@ package com.fishiphedia.user.controller;
 
 import com.fishiphedia.user.dto.LoginRequest;
 import com.fishiphedia.user.dto.RegisterRequest;
+import com.fishiphedia.user.entity.UserInfo;
 import com.fishiphedia.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -75,6 +76,17 @@ public class UserController {
             return ResponseEntity.ok(profile);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // 내 정보 조회 (UserInfo)
+    @GetMapping("/my-info")
+    public ResponseEntity<UserInfo> getMyInfo() {
+        try {
+            UserInfo userInfo = userService.getCurrentUserInfo();
+            return ResponseEntity.ok(userInfo);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 

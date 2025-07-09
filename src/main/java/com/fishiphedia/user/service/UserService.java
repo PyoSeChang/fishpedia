@@ -4,6 +4,8 @@ import java.util.Map;
 
 import com.fishiphedia.user.dto.LoginRequest;
 import com.fishiphedia.user.dto.RegisterRequest;
+import com.fishiphedia.user.entity.User;
+import com.fishiphedia.user.entity.UserInfo;
 
 public interface UserService {
     
@@ -24,7 +26,12 @@ public interface UserService {
     // 현재 사용자 프로필 조회
     Map<String, Object> getCurrentUserProfile();
     
+    // 현재 사용자 정보 조회 (UserInfo)
+    UserInfo getCurrentUserInfo();
+    
     // 관리자 계정 생성 (개발용)
     Map<String, Object> createAdmin(RegisterRequest request);
     
+    // 로그인 ID로 사용자 조회
+    User findByLoginId(String loginId);
 } 

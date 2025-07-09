@@ -13,4 +13,7 @@ public class FishCollectionResponse {
     private Integer highestScore;
     private Double highestLength;
     private LocalDate collectAt;
+    private Integer totalScore;
+    private Integer level;
+    private Double currentLevelProgress;
 } 

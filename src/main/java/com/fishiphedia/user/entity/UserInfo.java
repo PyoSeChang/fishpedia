@@ -14,6 +14,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+
+
 @Entity
 @Table(
     name = "user_info",
@@ -35,6 +37,9 @@ public class UserInfo {
     
     @Column(name = "level", nullable = false)
     private Integer level = 1;
+
+    @Column(name = "current_level_progress", nullable= false)
+    private Double currentLevelProgress = 0.0;
     
     @Column(name = "email")
     private String email;

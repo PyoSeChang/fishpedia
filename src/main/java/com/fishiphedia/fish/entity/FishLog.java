@@ -50,4 +50,7 @@ public class FishLog {
     
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
+    
+    @Column(name = "img_path")
+    private String imgPath;
 } 

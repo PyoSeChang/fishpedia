@@ -3,11 +3,14 @@ package com.fishiphedia.user.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fishiphedia.common.util.JwtUtil;
+import com.fishiphedia.fish.service.FishService;
 import com.fishiphedia.user.dto.LoginRequest;
 import com.fishiphedia.user.dto.RegisterRequest;
 import com.fishiphedia.user.entity.Role;
@@ -15,7 +18,6 @@ import com.fishiphedia.user.entity.User;
 import com.fishiphedia.user.entity.UserInfo;
 import com.fishiphedia.user.repository.UserInfoRepository;
 import com.fishiphedia.user.repository.UserRepository;
-import com.fishiphedia.fish.service.FishService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -121,6 +123,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserInfo getCurrentUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginId = authentication.getName();
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        
+        return userInfoRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다."));
+    }
+
+    @Override
     public Map<String, Object> createAdmin(RegisterRequest request) {
         // 중복 체크
         if (existsByLoginId(request.getLoginId())) {
@@ -154,5 +167,11 @@ public class UserServiceImpl implements UserService {
         result.put("userId", user.getId());
         result.put("role", user.getRole().name());
         return result;
+    }
+
+    @Override
+    public User findByLoginId(String loginId) {
+        return userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     }
 }

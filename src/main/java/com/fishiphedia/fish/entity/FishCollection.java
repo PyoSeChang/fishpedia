@@ -64,4 +64,10 @@ public class FishCollection {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "highest_log_id")
     private FishLog highestLog;
+
+    @Column(name = "level", nullable = false)
+    private Integer level = 1;
+
+    @Column(name = "current_level_progress", nullable= false)
+    private Double currentLevelProgress = 0.0;
 } 
