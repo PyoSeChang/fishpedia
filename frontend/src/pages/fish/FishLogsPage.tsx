@@ -50,15 +50,19 @@ const FishLogsPage: React.FC = () => {
     const loadFishLogs = async () => {
       try {
         setLoading(true);
+        setCollectionLoading(true);
         const fishIdParam = newSelectedFish === '' ? undefined : newSelectedFish;
         console.log('일지 조회 요청 - selectedFish:', newSelectedFish, 'fishIdParam:', fishIdParam);
         const result = await fishService.getFishLogs(fishIdParam);
         console.log('조회된 일지 개수:', result.fishLogs.length);
         setFishLogs(result.fishLogs);
+        setCollectionInfo(result.fishCollection);
+        console.log(result.fishCollection);
       } catch (error) {
         console.error('낚시 일지 로딩 실패:', error);
       } finally {
         setLoading(false);
+        setCollectionLoading(false);
       }
     };
     
@@ -66,35 +70,35 @@ const FishLogsPage: React.FC = () => {
   }, [location.search]);
 
   // 컬렉션 정보 로드
-  useEffect(() => {
-    const loadCollectionInfo = async () => {
-      try {
-        setCollectionLoading(true);
-        if (selectedFish) {
-          // 특정 물고기 컬렉션 정보
-          console.log('컬렉션 정보 로드 - fishId:', selectedFish);
-          const collections = await fishCollectionService.getMyCollection();
-          const collection = collections.find(c => c.fishId === selectedFish);
-          console.log('찾은 컬렉션:', collection);
-          setCollectionInfo(collection || null);
-          setUserInfo(null);
-        } else {
-          // 전체 사용자 정보
-          console.log('전체 사용자 정보 로드');
-          const userInfoData = await userService.getMyInfo();
-          console.log('사용자 정보:', userInfoData);
-          setUserInfo(userInfoData);
-          setCollectionInfo(null);
-        }
-      } catch (error) {
-        console.error('컬렉션 정보 로드 실패:', error);
-      } finally {
-        setCollectionLoading(false);
-      }
-    };
-
-    loadCollectionInfo();
-  }, [selectedFish, fishLogs.length]); // fishLogs.length를 의존성에 추가
+  // useEffect(() => {
+  //   const loadCollectionInfo = async () => {
+  //     try {
+  //       setCollectionLoading(true);
+  //       if (selectedFish) {
+  //         // 특정 물고기 컬렉션 정보
+  //         console.log('컬렉션 정보 로드 - fishId:', selectedFish);
+  //         const collections = await fishCollectionService.getMyCollection();
+  //         const collection = collections.find(c => c.fishId === selectedFish);
+  //         console.log('찾은 컬렉션:', collection);
+  //         setCollectionInfo(collection || null);
+  //         setUserInfo(null);
+  //       } else {
+  //         // 전체 사용자 정보
+  //         console.log('전체 사용자 정보 로드');
+  //         const userInfoData = await userService.getMyInfo();
+  //         console.log('사용자 정보:', userInfoData);
+  //         setUserInfo(userInfoData);
+  //         setCollectionInfo(null);
+  //       }
+  //     } catch (error) {
+  //       console.error('컬렉션 정보 로드 실패:', error);
+  //     } finally {
+  //       setCollectionLoading(false);
+  //     }
+  //   };
+  //
+  //   loadCollectionInfo();
+  // }, [selectedFish, fishLogs.length]); // fishLogs.length를 의존성에 추가
 
   const handleFishChange = (fishId: number | '') => {
     console.log('FishSelector 값 변경:', fishId, '타입:', typeof fishId);

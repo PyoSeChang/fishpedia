@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.fishiphedia.fish.dto.*;
+import com.fishiphedia.fish.entity.FishCollection;
 import com.fishiphedia.fish.service.FishCollectionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -92,18 +93,21 @@ public class FishLogController {
 
         
         List<FishLog> fishLogs;
-        FishCollectionResponse fishCollection = null;
+        FishCollectionResponse fishCollection;
         if (fishId != null) {
             fishLogs = fishLogService.getUserFishLogsByFish(user, fishId);
-            fishCollection = fishCollectionService.getFishCollectionByFish(fishId);
+            fishCollection= fishCollectionService.getFishCollectionByFish(fishId);
         } else {
             fishLogs = fishLogService.getUserFishLogs(user);
+            fishCollection = null;
         }
-        
+
         List<FishLogResponse> responses = fishLogs.stream()
                 .map(this::convertToResponse)
                 .collect(Collectors.toList());
-        
+        System.out.println("FishCollection.CurrentLevelProgress: "+fishCollection.getCurrentLevelProgress());
+        System.out.println("FishCollection.CurrentLevelProgress: "+fishCollection.getCurrentLevelProgress());
+        System.out.println("FishCollection.CurrentLevelProgress: "+fishCollection.getCurrentLevelProgress());
         return FishLogDTO.builder()
                 .fishLogs(responses)
                 .fishCollection(fishCollection)

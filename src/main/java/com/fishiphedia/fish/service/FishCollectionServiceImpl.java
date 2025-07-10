@@ -181,7 +181,7 @@ public class FishCollectionServiceImpl implements FishCollectionService {
         dto.setCollectAt(entity.getCollectAt());
         dto.setTotalScore(entity.getTotalScore());
         dto.setLevel(entity.getLevel());
-        dto.setCurrentLevelProgress(entity.getCurrentLevelProgress());
+        dto.setCurrentLevelProgress(entity.getCurrentLevelProgress()*100);
         return dto;
     }
 } 
