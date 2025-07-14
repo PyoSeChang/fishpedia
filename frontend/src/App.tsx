@@ -12,6 +12,9 @@ import RankingPage from './pages/ranking/RankingPage';
 import CommunityPage from './pages/community/CommunityPage';
 import PostDetailPage from './pages/community/PostDetailPage';
 import PostWritePage from './pages/community/PostWritePage';
+import BoardListPage from './pages/board/BoardListPage';
+import BoardDetailPage from './pages/board/BoardDetailPage';
+import BoardWritePage from './pages/board/BoardWritePage';
 import ProfilePage from './pages/profile/ProfilePage';
 import ProfileEditPage from './pages/profile/ProfileEditPage';
 import AdminPage from './pages/auth/AdminPage';
@@ -36,6 +39,12 @@ function App() {
               <Route index element={<CommunityPage />} />
               <Route path="post/:id" element={<PostDetailPage />} />
               <Route path="write" element={<PostWritePage />} />
+            </Route>
+            <Route path="board">
+              <Route index element={<BoardListPage />} />
+              <Route path=":id" element={<BoardDetailPage />} />
+              <Route path="write" element={<BoardWritePage />} />
+              <Route path="edit/:id" element={<BoardWritePage />} />
             </Route>
             <Route path="profile">
               <Route index element={<ProfilePage />} />

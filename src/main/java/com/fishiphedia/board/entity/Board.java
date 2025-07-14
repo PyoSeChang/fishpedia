@@ -31,12 +31,17 @@ public class Board {
     
     @Column(name = "read_count", nullable = false)
     private Integer readCount = 0;
+
+    private BoardCategory category;
     
     @Column(name = "title", nullable = false)
     private String title;
     
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
+
+    private String tags;
+    private boolean pinned;
     
     @PrePersist
     protected void onCreate() {
