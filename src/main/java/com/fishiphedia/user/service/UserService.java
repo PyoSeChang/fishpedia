@@ -34,4 +34,6 @@ public interface UserService {
     
     // 로그인 ID로 사용자 조회
     User findByLoginId(String loginId);
+
+    Map<String, Object> kakaoLogin(String code);
 } 

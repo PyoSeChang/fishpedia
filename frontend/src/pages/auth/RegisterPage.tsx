@@ -27,7 +27,12 @@ const RegisterPage: React.FC = () => {
     setError('');
 
     try {
-      await userService.register(formData);
+      // email을 loginId로 설정
+      const registerData = {
+        ...formData,
+        loginId: formData.email
+      };
+      await userService.register(registerData);
       alert('회원가입이 완료되었습니다!');
       navigate('/auth/login');
     } catch (error: any) {
@@ -55,21 +60,6 @@ const RegisterPage: React.FC = () => {
         
         <div className="bg-white p-8 rounded-xl shadow-lg">
           <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label htmlFor="loginId" className="block text-sm font-medium text-gray-700 mb-2">
-                아이디
-              </label>
-              <input
-                id="loginId"
-                name="loginId"
-                type="text"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="아이디를 입력하세요"
-                value={formData.loginId}
-                onChange={handleChange}
-              />
-            </div>
             
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -89,7 +79,7 @@ const RegisterPage: React.FC = () => {
             
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                이메일
+                이메일 (로그인 ID로 사용됩니다)
               </label>
               <input
                 id="email"

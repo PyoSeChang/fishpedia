@@ -44,6 +44,12 @@ export const userService = {
     return response.data;
   },
 
+  // 카카오 로그인
+  async kakaoLogin(code: string): Promise<LoginResponse> {
+    const response = await api.post('/users/kakao-login', { code });
+    return response.data;
+  },
+
   // 로그아웃
   async logout() {
     const response = await api.post('/users/logout');

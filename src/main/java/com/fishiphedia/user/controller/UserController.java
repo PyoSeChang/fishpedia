@@ -40,6 +40,19 @@ public class UserController {
         }
     }
 
+    // 카카오 로그인 콜백 처리
+    @PostMapping("/kakao-login")
+    public ResponseEntity<?> kakaoLogin(@RequestBody Map<String, String> request) {
+        try {
+            String code = request.get("code");
+            Map<String, Object> result = userService.kakaoLogin(code);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
     // 로그아웃
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {

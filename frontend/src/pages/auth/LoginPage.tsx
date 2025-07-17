@@ -11,6 +11,12 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  const KAKAO_AUTH_URL =
+      "https://kauth.kakao.com/oauth/authorize" +
+      "?client_id=a7f21c96241b51f363002bbe85fd5630" +
+      "&redirect_uri=http://localhost:3000/oauth/callback/kakao" +
+      "&response_type=code";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -54,15 +60,15 @@ const LoginPage: React.FC = () => {
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="loginId" className="block text-sm font-medium text-gray-700 mb-2">
-                아이디
+                이메일
               </label>
               <input
                 id="loginId"
                 name="loginId"
-                type="text"
+                type="email"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="아이디를 입력하세요"
+                placeholder="이메일을 입력하세요"
                 value={formData.loginId}
                 onChange={handleChange}
               />
@@ -129,6 +135,26 @@ const LoginPage: React.FC = () => {
                 회원가입
               </Link>
             </p>
+          </div>
+
+          <div className="mt-8">
+            <a
+                href={KAKAO_AUTH_URL}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold"
+                style={{
+                  backgroundColor: '#FEE500',
+                  color: '#3C1E1E',
+                  border: '1px solid #F0E3D7',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+                }}
+            >
+              {/* 카카오톡 아이콘 (svg) */}
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="none" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="24" fill="#FEE500"/>
+                <path fill="#3C1E1E" d="M24 12C15.7157 12 9 17.1193 9 23.0226c0 4.0833 3.25956 7.6597 8.1137 9.4473-.3386 1.1617-1.2296 4.2334-1.4162 4.9576 0 0-.0277.2482.1306.3444.1583.0961.3702-.0194.3702-.0194.4883-.0682 5.6268-3.7462 6.2009-4.1517.8672.0857 1.7592.1321 2.6019.1321 8.2843 0 15-5.1193 15-11.0226C39 17.1193 32.2843 12 24 12Z"/>
+              </svg>
+              카카오톡으로 로그인
+            </a>
           </div>
         </div>
       </div>
