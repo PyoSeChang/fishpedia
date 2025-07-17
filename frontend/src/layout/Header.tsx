@@ -41,7 +41,8 @@ const Header: React.FC = () => {
     { path: '/fish/collection', label: '도감', icon: '🐟' },
     { path: '/fish/logs', label: '낚시 일지', icon: '📋' },
     { path: '/ranking', label: '랭킹', icon: '🏆' },
-    { path: '/community', label: '커뮤니티', icon: '💬' },
+    // { path: '/community', label: '커뮤니티', icon: '💬' },
+    { path: '/board', label: '게시판', icon: '📝' },
     { 
       path: userRole === 'ADMIN' ? '/admin' : '/profile', 
       label: userRole === 'ADMIN' ? '관리자' : '프로필', 
