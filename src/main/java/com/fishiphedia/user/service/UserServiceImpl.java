@@ -3,6 +3,7 @@ package com.fishiphedia.user.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -171,27 +172,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public synchronized Map<String, Object> kakaoLogin(String code) {
+    public Map<String, Object> kakaoLogin(String code) {
         try {
+            System.out.println("카카오 로그인 시도 - code: " + code);
+            
             // 1. 카카오 토큰 발급 요청
             String tokenUri = "https://kauth.kakao.com/oauth/token";
             RestTemplate restTemplate = new RestTemplate();
-            Map<String, String> tokenParams = new HashMap<>();
-            tokenParams.put("grant_type", "authorization_code");
-            tokenParams.put("client_id", "a7f21c96241b51f363002bbe85fd5630"); // REST API 키
-            tokenParams.put("redirect_uri", "http://localhost:3000/oauth/callback/kakao");
-            tokenParams.put("code", code);
-
+            
             // application/x-www-form-urlencoded
             org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
+            
             org.springframework.util.MultiValueMap<String, String> body = new org.springframework.util.LinkedMultiValueMap<>();
-            body.setAll(tokenParams);
+            body.add("grant_type", "authorization_code");
+            body.add("client_id", "a7f21c96241b51f363002bbe85fd5630"); // REST API 키
+            body.add("redirect_uri", "http://localhost:3000/oauth/callback/kakao");
+            body.add("code", code);
 
             org.springframework.http.HttpEntity<org.springframework.util.MultiValueMap<String, String>> httpEntity =
                     new org.springframework.http.HttpEntity<>(body, headers);
 
+            System.out.println("카카오 토큰 요청 파라미터: " + body);
             Map<String, Object> tokenResponse = restTemplate.postForObject(tokenUri, httpEntity, Map.class);
+            System.out.println("카카오 토큰 응답: " + tokenResponse);
             String accessToken = (String) tokenResponse.get("access_token");
 
             // 2. 카카오 사용자 정보 요청
@@ -200,7 +204,12 @@ public class UserServiceImpl implements UserService {
             infoHeaders.setBearerAuth(accessToken);
 
             org.springframework.http.HttpEntity<Void> infoEntity = new org.springframework.http.HttpEntity<>(infoHeaders);
-            Map<String, Object> userInfoResponse = restTemplate.postForObject(userInfoUri, infoEntity, Map.class);
+            Map<String, Object> userInfoResponse = restTemplate.exchange(
+                userInfoUri, 
+                org.springframework.http.HttpMethod.GET, 
+                infoEntity, 
+                Map.class
+            ).getBody();
             System.out.println("카카오 userInfoResponse: " + userInfoResponse);
 
             // 3. 카카오 계정에서 이메일/ID 추출
@@ -258,5 +267,99 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("카카오 로그인 실패: " + e.getMessage(), e);
         }
     }
+
+    @Override
+    public Map<String, Object> naverLogin(String code) {
+        try {
+            System.out.println("네이버 로그인 시도 - code: " + code);
+
+            // 1. 네이버 토큰 발급 요청
+            String tokenUri = "https://nid.naver.com/oauth2.0/token";
+            RestTemplate restTemplate = new RestTemplate();
+
+            // application/x-www-form-urlencoded
+            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED);
+
+            org.springframework.util.MultiValueMap<String, String> body = new org.springframework.util.LinkedMultiValueMap<>();
+            body.add("grant_type", "authorization_code");
+            body.add("client_id", "djkxODvesdxbkDC5bz0j"); // 네이버 REST API
+            body.add("client_secret", "5OLcLU7kkL"); // 네이버 REST API
+            body.add("code", code);
+            body.add("state", "RANDOM_STATE"); // 실제로는 인증 요청 시 사용한 state 값과 동일하게 보내야 함
+
+            org.springframework.http.HttpEntity<org.springframework.util.MultiValueMap<String, String>> httpEntity =
+                    new org.springframework.http.HttpEntity<>(body, headers);
+
+            Map tokenResponse = restTemplate.postForObject(tokenUri, httpEntity, Map.class);
+            System.out.println("네이버 토큰 응답: " + tokenResponse);
+            String accessToken = (String) tokenResponse.get("access_token");
+
+            // 2. 네이버 사용자 정보 요청
+            String userInfoUri = "https://openapi.naver.com/v1/nid/me";
+            org.springframework.http.HttpHeaders infoHeaders = new org.springframework.http.HttpHeaders();
+            infoHeaders.setBearerAuth(accessToken);
+
+            org.springframework.http.HttpEntity<Void> infoEntity = new org.springframework.http.HttpEntity<>(infoHeaders);
+            Map userInfoResponse = restTemplate.exchange(
+                    userInfoUri,
+                    HttpMethod.GET,
+                    infoEntity,
+                    Map.class
+            ).getBody();
+            System.out.println("네이버 userInfoResponse: " + userInfoResponse);
+
+            // 3. 사용자 정보 파싱 (response.user)
+            Map<String, Object> responseMap = (Map<String, Object>) userInfoResponse.get("response");
+            if (responseMap == null) throw new RuntimeException("네이버 사용자 정보 조회 실패");
+
+            String email = (String) responseMap.get("email");
+            String nickname = (String) responseMap.get("nickname");
+            String naverId = (String) responseMap.get("id");
+
+            // 4. 우리 서비스 회원 존재 여부 확인 (email을 loginId로 사용)
+            User user = userRepository.findByLoginId(email).orElse(null);
+
+            if (user == null) {
+                try {
+                    // 회원이 아니면 자동 회원가입
+                    user = new User();
+                    user.setLoginId(email); // 이메일을 loginId로 사용
+                    user.setPassword(passwordEncoder.encode("naver_dummy_password_" + naverId));
+                    user.setRole(Role.USER);
+                    userRepository.save(user);
+
+                    UserInfo userInfo = new UserInfo();
+                    userInfo.setName(nickname);
+                    userInfo.setEmail(email);
+                    userInfo.setLevel(1);
+                    userInfo.setUser(user);
+                    userInfoRepository.save(userInfo);
+
+                    fishService.copyFishToCollection(user.getId());
+                } catch (org.springframework.dao.DataIntegrityViolationException e) {
+                    user = userRepository.findByLoginId(email)
+                            .orElseThrow(() -> new RuntimeException("사용자 조회 실패"));
+                }
+            }
+
+            // 5. JWT 토큰 발급
+            String jwtAccessToken = jwtUtil.generateAccessToken(user.getLoginId());
+            String jwtRefreshToken = jwtUtil.generateRefreshToken(user.getLoginId());
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("message", "네이버 로그인 완료");
+            result.put("accessToken", jwtAccessToken);
+            result.put("refreshToken", jwtRefreshToken);
+            result.put("loginId", user.getLoginId());
+            result.put("role", user.getRole().name());
+            return result;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("네이버 로그인 실패: " + e.getMessage(), e);
+        }
+    }
+
 
 }

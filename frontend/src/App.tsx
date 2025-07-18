@@ -20,6 +20,7 @@ import ProfileEditPage from './pages/profile/ProfileEditPage';
 import AdminPage from './pages/auth/AdminPage';
 import './App.css';
 import KakaoCallbackPage from "./pages/auth/KakaoCallbackPage";
+import NaverCallbackPage from "./pages/auth/NaverCallbackPage";
 
 function App() {
   return (
@@ -58,7 +59,8 @@ function App() {
             <Route path="register" element={<RegisterPage />} />
             <Route path="forgot-password" element={<ForgotPasswordPage />} />
           </Route>
-          <Route path="/oauth/callback/kakao" element={<KakaoCallbackPage />} /><Route path="/oauth/callback/kakao" element={<KakaoCallbackPage />} />
+          <Route path="/oauth/callback/kakao" element={<KakaoCallbackPage />} />
+          <Route path="/oauth/callback/naver" element={<NaverCallbackPage />} />
         </Routes>
       </div>
     </Router>

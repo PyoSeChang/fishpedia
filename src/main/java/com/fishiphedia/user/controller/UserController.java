@@ -52,6 +52,19 @@ public class UserController {
         }
     }
 
+    // 네이버 로그인 콜백 처리
+    @PostMapping("/naver-login")
+    public ResponseEntity<?> naverLogin(@RequestBody Map<String, String> request) {
+        try {
+            String code = request.get("code");
+            Map<String, Object> result = userService.naverLogin(code);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
 
     // 로그아웃
     @PostMapping("/logout")

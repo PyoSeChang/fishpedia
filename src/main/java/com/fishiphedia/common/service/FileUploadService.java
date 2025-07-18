@@ -17,26 +17,51 @@ public class FileUploadService {
     private String uploadPath;
 
     public String uploadFile(MultipartFile file) throws IOException {
+        System.out.println("파일 업로드 시작 - 파일명: " + file.getOriginalFilename());
+        System.out.println("파일 크기: " + file.getSize());
+        System.out.println("업로드 경로: " + uploadPath);
+        
+        // 파일 유효성 검사
+        if (file.isEmpty()) {
+            throw new IOException("업로드할 파일이 비어있습니다.");
+        }
+        
         // 업로드 디렉토리 생성
         Path uploadDir = Paths.get(uploadPath);
         if (!Files.exists(uploadDir)) {
+            System.out.println("업로드 디렉토리 생성: " + uploadDir.toAbsolutePath());
             Files.createDirectories(uploadDir);
         }
 
-        // 파일명 중복 방지를 위한 UUID 생성
+        // 파일 확장자 검증
         String originalFilename = file.getOriginalFilename();
-        String fileExtension = "";
-        if (originalFilename != null && originalFilename.contains(".")) {
-            fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        if (originalFilename == null || originalFilename.isEmpty()) {
+            throw new IOException("파일명이 유효하지 않습니다.");
         }
+        
+        String fileExtension = "";
+        if (originalFilename.contains(".")) {
+            fileExtension = originalFilename.substring(originalFilename.lastIndexOf(".")).toLowerCase();
+        }
+        
+        // 허용된 확장자인지 확인
+        if (!fileExtension.matches("\\.(jpg|jpeg|png|gif)")) {
+            throw new IOException("지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif만 가능)");
+        }
+        
+        // 파일명 중복 방지를 위한 UUID 생성
         String filename = UUID.randomUUID().toString() + fileExtension;
 
         // 파일 저장
         Path filePath = uploadDir.resolve(filename);
+        System.out.println("파일 저장 경로: " + filePath.toAbsolutePath());
+        
         Files.copy(file.getInputStream(), filePath);
-
-        // 상대 경로 반환 (클라이언트에서 접근 가능한 경로)
-        return "/uploads/fish/" + filename;
+        
+        String returnPath = "/uploads/fish/" + filename;
+        System.out.println("반환 경로: " + returnPath);
+        
+        return returnPath;
     }
 
     public void deleteFile(String filePath) {

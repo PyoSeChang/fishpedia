@@ -49,3 +49,4 @@ file:
   upload:
     path: ./uploads/fish/
     allowed-types: jpg,jpeg,png,gif
+    base-url: http://localhost:8081

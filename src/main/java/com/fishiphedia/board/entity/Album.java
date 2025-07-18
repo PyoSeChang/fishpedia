@@ -9,42 +9,35 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "board")
+@Table(name = "album")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Board {
+public class Album {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id", nullable = false, unique = true)
+    private Board board;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     
-    @OneToOne(mappedBy = "board", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Album album;
+    @Column(name = "image_path", nullable = false)
+    private String imagePath;
+    
+    @Column(name = "description")
+    private String description;
     
     @Column(name = "create_at", nullable = false)
     private LocalDateTime createAt;
     
     @Column(name = "update_at")
     private LocalDateTime updateAt;
-    
-    @Column(name = "read_count", nullable = false)
-    private Integer readCount = 0;
-
-    private BoardCategory category;
-    
-    @Column(name = "title", nullable = false)
-    private String title;
-    
-    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
-    private String content;
-
-    private String tags;
-    private boolean pinned;
     
     @PrePersist
     protected void onCreate() {
@@ -55,4 +48,4 @@ public class Board {
     protected void onUpdate() {
         updateAt = LocalDateTime.now();
     }
-} 
+}

@@ -15,6 +15,14 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         // 업로드된 파일들을 정적 리소스로 서빙
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + uploadPath + "/");
+                .addResourceLocations("file:" + uploadPath)
+                .setCachePeriod(3600)
+                .resourceChain(true);
+        
+        // fish 이미지 전용 핸들러 추가
+        registry.addResourceHandler("/uploads/fish/**")
+                .addResourceLocations("file:" + uploadPath)
+                .setCachePeriod(3600)
+                .resourceChain(true);
     }
 } 

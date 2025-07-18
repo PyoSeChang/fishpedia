@@ -1,9 +1,11 @@
 package com.fishiphedia.board.service;
 
 import com.fishiphedia.board.dto.*;
+import com.fishiphedia.board.entity.Album;
 import com.fishiphedia.board.entity.Board;
 import com.fishiphedia.board.entity.BoardCategory;
 import com.fishiphedia.board.entity.Comment;
+import com.fishiphedia.board.repository.AlbumRepository;
 import com.fishiphedia.board.repository.BoardRepository;
 import com.fishiphedia.board.repository.CommentRepository;
 import com.fishiphedia.user.entity.User;
@@ -26,6 +28,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+    private final AlbumRepository albumRepository;
     private final UserService userService;
 
     @Override
@@ -201,6 +204,14 @@ public class BoardServiceImpl implements BoardService {
         response.setUpdateAt(board.getUpdateAt());
         response.setAuthorName(board.getUser().getUserInfo().getName());
         response.setAuthorId(board.getUser().getId());
+        
+        // 이미지 목록 추가
+        List<Album> albums = albumRepository.findByBoardId(board.getId());
+        List<AlbumResponse> images = albums.stream()
+                .map(this::convertToAlbumResponse)
+                .collect(Collectors.toList());
+        response.setImages(images);
+        
         return response;
     }
 
@@ -215,5 +226,41 @@ public class BoardServiceImpl implements BoardService {
         response.setAuthorId(comment.getUser().getId());
         response.setParentId(comment.getParent() != null ? comment.getParent().getId() : null);
         return response;
+    }
+    
+    @Override
+    public AlbumResponse addImageToBoard(Long boardId, String imagePath, String description, String loginId) {
+        User user = userService.findByLoginId(loginId);
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+        
+        Album album = new Album();
+        album.setBoard(board);
+        album.setUser(user);
+        album.setImagePath(imagePath);
+        album.setDescription(description);
+        
+        Album savedAlbum = albumRepository.save(album);
+        return convertToAlbumResponse(savedAlbum);
+    }
+    
+    @Override
+    public List<AlbumResponse> getBoardImages(Long boardId) {
+        List<Album> albums = albumRepository.findByBoardId(boardId);
+        return albums.stream()
+                .map(this::convertToAlbumResponse)
+                .collect(Collectors.toList());
+    }
+    
+    private AlbumResponse convertToAlbumResponse(Album album) {
+        return AlbumResponse.builder()
+                .id(album.getId())
+                .imagePath(album.getImagePath())
+                .description(album.getDescription())
+                .createAt(album.getCreateAt())
+                .updateAt(album.getUpdateAt())
+                .authorName(album.getUser().getUserInfo().getName())
+                .authorId(album.getUser().getId())
+                .build();
     }
 } 

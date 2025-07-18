@@ -36,4 +36,5 @@ public interface UserService {
     User findByLoginId(String loginId);
 
     Map<String, Object> kakaoLogin(String code);
+    Map<String, Object> naverLogin(String code);
 } 

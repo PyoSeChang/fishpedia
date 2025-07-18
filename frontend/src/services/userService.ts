@@ -50,6 +50,12 @@ export const userService = {
     return response.data;
   },
 
+  // 네이버 로그인
+  async naverLogin(code: string): Promise<LoginResponse> {
+    const response = await api.post('/users/naver-login', { code });
+    return response.data;
+  },
+
   // 로그아웃
   async logout() {
     const response = await api.post('/users/logout');

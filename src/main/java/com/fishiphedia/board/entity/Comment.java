@@ -1,6 +1,6 @@
 package com.fishiphedia.board.entity;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.fishiphedia.user.entity.User;
 
@@ -39,10 +39,10 @@ public class Comment {
     private Board board;
     
     @Column(name = "create_at", nullable = false)
-    private LocalDate createAt;
+    private LocalDateTime createAt;
     
     @Column(name = "update_at")
-    private LocalDate updateAt;
+    private LocalDateTime updateAt;
     
     @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     private String content;
@@ -55,11 +55,11 @@ public class Comment {
     
     @PrePersist
     protected void onCreate() {
-        createAt = LocalDate.now();
+        createAt = LocalDateTime.now();
     }
     
     @PreUpdate
     protected void onUpdate() {
-        updateAt = LocalDate.now();
+        updateAt = LocalDateTime.now();
     }
 } 

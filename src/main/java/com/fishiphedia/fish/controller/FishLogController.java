@@ -45,13 +45,16 @@ public class FishLogController {
         // 이미지 업로드 처리
         if (image != null && !image.isEmpty()) {
             try {
+                log.info("이미지 업로드 시작 - 파일명: {}, 크기: {}", image.getOriginalFilename(), image.getSize());
                 String imgPath = fileUploadService.uploadFile(image);
                 request.setImgPath(imgPath);
                 log.info("이미지 업로드 성공: {}", imgPath);
             } catch (Exception e) {
-                log.error("이미지 업로드 실패", e);
-                return ResponseEntity.badRequest().build();
+                log.error("이미지 업로드 실패 - 파일명: {}, 에러: {}", image.getOriginalFilename(), e.getMessage(), e);
+                return ResponseEntity.badRequest().body(null);
             }
+        } else {
+            log.info("업로드할 이미지 없음");
         }
         
         FishLogCreateResponse response = fishLogService.createFishLogWithLevel(request, user);
@@ -70,13 +73,16 @@ public class FishLogController {
         // 이미지 업로드 처리
         if (image != null && !image.isEmpty()) {
             try {
+                log.info("이미지 업로드 시작 - 파일명: {}, 크기: {}", image.getOriginalFilename(), image.getSize());
                 String imgPath = fileUploadService.uploadFile(image);
                 request.setImgPath(imgPath);
                 log.info("이미지 업로드 성공: {}", imgPath);
             } catch (Exception e) {
-                log.error("이미지 업로드 실패", e);
-                return ResponseEntity.badRequest().build();
+                log.error("이미지 업로드 실패 - 파일명: {}, 에러: {}", image.getOriginalFilename(), e.getMessage(), e);
+                return ResponseEntity.badRequest().body(null);
             }
+        } else {
+            log.info("업로드할 이미지 없음");
         }
         
         FishLogCreateResponse response = fishLogService.createFishLogWithLevel(request, user);

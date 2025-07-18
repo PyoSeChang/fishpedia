@@ -35,4 +35,10 @@ public interface BoardService {
     
     // 게시글의 댓글 목록 조회
     List<CommentResponse> getCommentsByBoardId(Long boardId);
+    
+    // 게시글에 이미지 추가
+    AlbumResponse addImageToBoard(Long boardId, String imagePath, String description, String loginId);
+    
+    // 게시글의 이미지 목록 조회
+    List<AlbumResponse> getBoardImages(Long boardId);
 } 
