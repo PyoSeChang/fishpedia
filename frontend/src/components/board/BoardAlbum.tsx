@@ -13,12 +13,16 @@ interface BoardAlbumProps {
   boardId?: number;
   onImageSelect?: (imageUrl: string) => void;
   showUpload?: boolean;
+  externalImages?: { file: File; url: string; id: string }[];
+  onImageDescriptionUpdate?: (imageId: string, description: string) => void;
 }
 
 const BoardAlbum: React.FC<BoardAlbumProps> = ({ 
   boardId, 
   onImageSelect, 
-  showUpload = true 
+  showUpload = true,
+  externalImages = [],
+  onImageDescriptionUpdate
 }) => {
   const [albums, setAlbums] = useState<BoardAlbumImage[]>([]);
   const [loading, setLoading] = useState(false);
@@ -29,6 +33,9 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [externalImageDescriptions, setExternalImageDescriptions] = useState<Record<string, string>>({});
+  const [editingDescriptionId, setEditingDescriptionId] = useState<string | null>(null);
+  const [tempDescription, setTempDescription] = useState<string>('');
 
   useEffect(() => {
     if (boardId) {
@@ -98,8 +105,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
 
   const handleImageClick = (index: number) => {
     if (onImageSelect) {
-      const fullImageUrl = `http://localhost:8081${albums[index].imagePath}`;
-      onImageSelect(fullImageUrl);
+      onImageSelect(allImages[index].imageUrl);
     } else {
       setSelectedIndex(index);
       setShowModal(true);
@@ -113,7 +119,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
   };
 
   const handleNext = () => {
-    if (selectedIndex !== null && selectedIndex < albums.length - 1) {
+    if (selectedIndex !== null && selectedIndex < allImages.length - 1) {
       setSelectedIndex(selectedIndex + 1);
     }
   };
@@ -128,6 +134,50 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
       minute: '2-digit'
     });
   };
+
+  const handleDescriptionEdit = (imageId: string, currentDescription: string) => {
+    setEditingDescriptionId(imageId);
+    setTempDescription(currentDescription);
+  };
+
+  const handleDescriptionSave = (imageId: string) => {
+    setExternalImageDescriptions(prev => ({
+      ...prev,
+      [imageId]: tempDescription
+    }));
+    if (onImageDescriptionUpdate) {
+      onImageDescriptionUpdate(imageId, tempDescription);
+    }
+    setEditingDescriptionId(null);
+    setTempDescription('');
+  };
+
+  const handleDescriptionCancel = () => {
+    setEditingDescriptionId(null);
+    setTempDescription('');
+  };
+
+  // Combine server images and external images for display
+  const allImages = [
+    ...albums.map(album => ({
+      id: `server-${album.id}`,
+      type: 'server' as const,
+      imagePath: album.imagePath,
+      imageUrl: `http://localhost:8081${album.imagePath}`,
+      description: album.description || '',
+      createAt: album.createAt,
+      authorId: album.authorId
+    })),
+    ...externalImages.map(extImg => ({
+      id: `external-${extImg.id}`,
+      type: 'external' as const,
+      imagePath: '',
+      imageUrl: extImg.url,
+      description: externalImageDescriptions[extImg.id] || '',
+      createAt: new Date().toISOString(),
+      authorId: 0
+    }))
+  ];
 
   if (loading) return <div className="text-center py-4">로딩 중...</div>;
   if (error) return <div className="text-center py-4 text-red-500">{error}</div>;
@@ -185,39 +235,111 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
       {/* 갤러리 */}
       <div>
         <h4 className="text-sm font-medium text-gray-700 mb-3">
-          📷 앨범 ({albums.length}장)
+          📷 앨범 ({allImages.length}장)
         </h4>
         
-        {albums.length === 0 ? (
+        {allImages.length === 0 ? (
           <div className="text-center py-8 text-gray-500 text-sm">
-            보드에 아직 이미지가 없습니다.
+            이미지가 없습니다. 에디터에서 이미지를 업로드해보세요.
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
-            {albums.map((album, index) => (
-              <div
-                key={album.id}
-                className="relative group cursor-pointer"
-                onClick={() => handleImageClick(index)}
-              >
-                <div className="aspect-square overflow-hidden rounded border hover:border-blue-400 transition-colors">
-                  <img
-                    src={`http://localhost:8081${album.imagePath}`}
-                    alt={album.description || '앨범 이미지'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
-                </div>
-                
-                {onImageSelect && (
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded flex items-center justify-center">
-                    <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="text-lg">📤</div>
-                      <p className="text-xs">선택</p>
-                    </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-2">
+              {allImages.map((image, index) => (
+                <div
+                  key={image.id}
+                  className="relative group cursor-pointer"
+                  onClick={() => handleImageClick(index)}
+                >
+                  <div className="aspect-square overflow-hidden rounded border hover:border-blue-400 transition-colors">
+                    <img
+                      src={image.imageUrl}
+                      alt={image.description || '앨범 이미지'}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    />
                   </div>
-                )}
+                  
+                  {/* 외부 이미지 표시 */}
+                  {image.type === 'external' && (
+                    <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                      📝
+                    </div>
+                  )}
+                  
+                  {onImageSelect && (
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded flex items-center justify-center">
+                      <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="text-lg">📤</div>
+                        <p className="text-xs">선택</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            {/* 외부 이미지 설명 편집 섹션 */}
+            {externalImages.length > 0 && (
+              <div className="border-t pt-4">
+                <h5 className="text-sm font-medium text-gray-700 mb-2">📝 에디터 이미지 설명</h5>
+                <div className="space-y-2">
+                  {externalImages.map((extImg) => {
+                    const imageId = extImg.id;
+                    const currentDescription = externalImageDescriptions[imageId] || '';
+                    const isEditing = editingDescriptionId === imageId;
+                    
+                    return (
+                      <div key={imageId} className="flex items-start gap-2 p-2 bg-gray-50 rounded">
+                        <img
+                          src={extImg.url}
+                          alt="미리보기"
+                          className="w-12 h-12 object-cover rounded border"
+                        />
+                        <div className="flex-1">
+                          {isEditing ? (
+                            <div className="space-y-2">
+                              <textarea
+                                value={tempDescription}
+                                onChange={(e) => setTempDescription(e.target.value)}
+                                placeholder="이미지 설명을 입력하세요..."
+                                className="w-full px-2 py-1 text-sm border rounded resize-none"
+                                rows={2}
+                              />
+                              <div className="flex gap-1">
+                                <button
+                                  onClick={() => handleDescriptionSave(imageId)}
+                                  className="px-2 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600"
+                                >
+                                  저장
+                                </button>
+                                <button
+                                  onClick={handleDescriptionCancel}
+                                  className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
+                                >
+                                  취소
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-1">
+                              <p className="text-sm text-gray-700">
+                                {currentDescription || '설명 없음'}
+                              </p>
+                              <button
+                                onClick={() => handleDescriptionEdit(imageId, currentDescription)}
+                                className="text-xs text-blue-500 hover:text-blue-700"
+                              >
+                                {currentDescription ? '수정' : '설명 추가'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
@@ -242,7 +364,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
               </button>
             )}
 
-            {selectedIndex < albums.length - 1 && (
+            {selectedIndex < allImages.length - 1 && (
               <button
                 onClick={handleNext}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl z-10"
@@ -252,17 +374,20 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
             )}
 
             <img
-              src={`http://localhost:8081${albums[selectedIndex].imagePath}`}
-              alt={albums[selectedIndex].description || '앨범 이미지'}
+              src={allImages[selectedIndex].imageUrl}
+              alt={allImages[selectedIndex].description || '앨범 이미지'}
               className="max-w-full max-h-[80vh] object-contain"
             />
 
             <div className="absolute bottom-4 left-4 right-4 bg-black bg-opacity-50 text-white p-3 rounded">
               <p className="text-sm">
-                {albums[selectedIndex].description || '설명 없음'}
+                {allImages[selectedIndex].description || '설명 없음'}
               </p>
               <p className="text-xs text-gray-300 mt-1">
-                {formatDate(albums[selectedIndex].createAt)}
+                {formatDate(allImages[selectedIndex].createAt)}
+                {allImages[selectedIndex].type === 'external' && (
+                  <span className="ml-2 text-blue-300">📝 에디터 이미지</span>
+                )}
               </p>
             </div>
           </div>

@@ -1,4 +1,113 @@
-# Getting Started with Create React App
+# Fishipedia Frontend
+
+Fishipedia는 낚시꾼들을 위한 종합 플랫폼입니다. 물고기 도감, 낚시 일지, 낚시 스팟 지도, 커뮤니티 기능을 제공합니다.
+
+## 주요 기능
+
+### 🐟 물고기 도감
+- 다양한 물고기 정보 조회
+- 물고기별 상세 정보 및 낚시 팁
+
+### 📋 낚시 일지
+- 개인 낚시 기록 관리
+- 물고기 포획 기록 및 통계
+- 레벨 시스템 및 점수 관리
+
+### 📍 낚시 스팟 (NEW!)
+- **지도 기반 낚시 스팟 탐색**
+- **네이버 지도 API 연동**
+- **스팟별 상세 정보 (어종, 난이도, 시설 등)**
+- **필터링 및 검색 기능**
+- **실시간 마커 클릭으로 상세 정보 확인**
+
+### 💬 커뮤니티
+- 게시판 (공지사항, 자유게시판, 질문게시판, 팁게시판, 리뷰게시판)
+- 낚시꾼 및 물고기 랭킹 시스템
+- Slate 에디터를 통한 풍부한 텍스트 편집
+- 이미지 업로드 및 앨범 기능
+
+## 기술 스택
+
+- **Frontend**: React 19.1.0, TypeScript
+- **Styling**: Tailwind CSS
+- **텍스트 에디터**: Slate.js
+- **지도 API**: 네이버 지도 API
+- **라우팅**: React Router Dom
+- **HTTP 클라이언트**: Axios
+
+## 네이버 지도 API 설정
+
+낚시 스팟 기능을 사용하려면 네이버 클라우드 플랫폼에서 지도 API 키를 발급받아야 합니다.
+
+### 1. API 키 발급
+1. [네이버 클라우드 플랫폼](https://www.ncloud.com/)에서 계정 생성
+2. **AI·Application Service > AI·NAVER API > Maps** 메뉴 이동
+3. **Application 등록** 클릭
+4. 서비스 정보 입력:
+   - **Application 이름**: Fishipedia (또는 원하는 이름)
+   - **서비스 URL**: http://localhost:3000
+   - **Maps**: Web Dynamic Map 선택
+
+### 2. 도메인 설정 (중요!)
+**API 인증 실패의 가장 흔한 원인**
+```
+허용 도메인 설정:
+- http://localhost:3000
+- http://127.0.0.1:3000
+- http://localhost:3000/spots (필요시)
+```
+
+### 3. 환경 변수 설정
+`.env` 파일에 API 키 설정:
+```bash
+REACT_APP_NAVER_MAP_CLIENT_ID=your_client_id_here
+REACT_APP_NAVER_MAP_CLIENT_SECRET=your_client_secret_here
+```
+
+### 🔧 트러블슈팅
+
+#### ❌ "Open API 인증이 실패했습니다" (Error Code 200)
+**원인**: 웹 서비스 URL 미등록
+**해결**: 
+1. [네이버 클라우드 플랫폼 콘솔](https://console.ncloud.com) 접속
+2. AI·Application Service → AI·NAVER API → Maps
+3. 해당 Application 클릭 → **웹 서비스 URL**에 다음 추가:
+   ```
+   http://localhost:3000
+   ```
+
+#### ⚠️ 중요: API 전환 안내
+**기존 AI NAVER API → 신규 Maps API 전환 필요**
+- 기존 API 점진적 종료 예정
+- 신규 API 가이드: https://navermaps.github.io/maps.js.ncp/docs/tutorial-2-Getting-Started.html
+
+#### ❌ "스크립트 로딩 실패"
+**원인**: 네트워크 문제 또는 잘못된 API 키
+**해결**: 
+1. 인터넷 연결 확인
+2. API 키 재확인
+3. 브라우저 콘솔에서 상세 에러 확인
+
+#### ❌ "지도가 회색으로 표시됨"
+**원인**: API 로딩은 됐지만 인증 실패
+**해결**: 
+1. 허용 도메인 재확인
+2. API 서비스 활성화 상태 확인
+3. 무료 사용량 초과 여부 확인
+
+#### 🔍 디버깅 방법
+브라우저 개발자 도구(F12) > Console 탭에서 다음 로그 확인:
+```
+✅ "네이버 지도 API 로딩 시작..."
+✅ "네이버 지도 API 로딩 완료"
+✅ "네이버 지도 초기화 시작..."
+✅ "지도 생성 완료!"
+✅ "마커 추가 완료: 한강 반포대교 낚시터"
+```
+
+#### 📞 현재 설정된 API 키
+- **Client ID**: `gfnyi4izq0`
+- **도메인 등록 필요**: `localhost:3000`, `127.0.0.1:3000`
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 

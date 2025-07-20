@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { createEditor, Descendant, Editor, Element as SlateElement, Transforms, Text } from 'slate';
-import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, useSlateStatic } from 'slate-react';
+import { Slate, Editable, withReact, RenderElementProps, RenderLeafProps, useSlateStatic, ReactEditor } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { 
   Bold, 
@@ -15,12 +15,32 @@ import {
   Image 
 } from 'lucide-react';
 
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: ReactEditor
+    Element: {
+      type: string
+      align?: string
+      url?: string
+      alt?: string
+      children: Descendant[]
+    }
+    Text: {
+      text: string
+      bold?: true
+      italic?: true
+      underline?: true
+    }
+  }
+}
+
 interface SlateRichTextEditorProps {
   value: string;
   onChange: (content: string) => void;
   placeholder?: string;
   height?: number;
   onImageUpload?: (file: File) => Promise<string>;
+  onImageUploaded?: (file: File, imageUrl: string) => void;
 }
 
 const SlateRichTextEditor: React.FC<SlateRichTextEditorProps> = ({
@@ -28,7 +48,8 @@ const SlateRichTextEditor: React.FC<SlateRichTextEditorProps> = ({
   onChange,
   placeholder = '내용을 입력해주세요...',
   height = 400,
-  onImageUpload
+  onImageUpload,
+  onImageUploaded
 }) => {
   const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))), []);
   const [editorValue, setEditorValue] = useState<Descendant[]>(() => {
@@ -64,6 +85,9 @@ const SlateRichTextEditor: React.FC<SlateRichTextEditorProps> = ({
         try {
           const url = await onImageUpload(file);
           insertImage(editor, url);
+          if (onImageUploaded) {
+            onImageUploaded(file, url);
+          }
         } catch (error) {
           alert('이미지 업로드에 실패했습니다.');
         }
@@ -74,38 +98,38 @@ const SlateRichTextEditor: React.FC<SlateRichTextEditorProps> = ({
 
   return (
     <div className="border border-gray-300 rounded-md">
-      {/* 툴바 */}
-      <div className="border-b border-gray-200 p-2 flex flex-wrap gap-1">
-        <MarkButton format="bold" icon={Bold} />
-        <MarkButton format="italic" icon={Italic} />
-        <MarkButton format="underline" icon={Underline} />
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-        <BlockButton format="heading-one" text="H1" />
-        <BlockButton format="heading-two" text="H2" />
-        <BlockButton format="heading-three" text="H3" />
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-        <BlockButton format="left" icon={AlignLeft} />
-        <BlockButton format="center" icon={AlignCenter} />
-        <BlockButton format="right" icon={AlignRight} />
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-        <BlockButton format="numbered-list" icon={ListOrdered} />
-        <BlockButton format="bulleted-list" icon={List} />
-        <BlockButton format="block-quote" icon={Quote} />
-        <div className="w-px h-6 bg-gray-300 mx-1" />
-        {onImageUpload && (
-          <button
-            onClick={handleImageUpload}
-            className="p-1 hover:bg-gray-100 rounded"
-            title="이미지 삽입"
-          >
-            <Image size={16} />
-          </button>
-        )}
-      </div>
+      <Slate editor={editor} initialValue={editorValue} onChange={handleChange}>
+        {/* 툴바 */}
+        <div className="border-b border-gray-200 p-2 flex flex-wrap gap-1">
+          <MarkButton format="bold" icon={Bold} />
+          <MarkButton format="italic" icon={Italic} />
+          <MarkButton format="underline" icon={Underline} />
+          <div className="w-px h-6 bg-gray-300 mx-1" />
+          <BlockButton format="heading-one" text="H1" />
+          <BlockButton format="heading-two" text="H2" />
+          <BlockButton format="heading-three" text="H3" />
+          <div className="w-px h-6 bg-gray-300 mx-1" />
+          <BlockButton format="left" icon={AlignLeft} />
+          <BlockButton format="center" icon={AlignCenter} />
+          <BlockButton format="right" icon={AlignRight} />
+          <div className="w-px h-6 bg-gray-300 mx-1" />
+          <BlockButton format="numbered-list" icon={ListOrdered} />
+          <BlockButton format="bulleted-list" icon={List} />
+          <BlockButton format="block-quote" icon={Quote} />
+          <div className="w-px h-6 bg-gray-300 mx-1" />
+          {onImageUpload && (
+            <button
+              onClick={handleImageUpload}
+              className="p-1 hover:bg-gray-100 rounded"
+              title="이미지 삽입"
+            >
+              <Image size={16} />
+            </button>
+          )}
+        </div>
 
-      {/* 에디터 */}
-      <div style={{ height: `${height}px` }} className="overflow-y-auto">
-        <Slate editor={editor} value={editorValue} onChange={handleChange}>
+        {/* 에디터 */}
+        <div style={{ height: `${height}px` }} className="overflow-y-auto">
           <Editable
             renderElement={renderElement}
             renderLeaf={renderLeaf}
@@ -113,14 +137,14 @@ const SlateRichTextEditor: React.FC<SlateRichTextEditorProps> = ({
             className="p-4 min-h-full outline-none"
             spellCheck={false}
           />
-        </Slate>
-      </div>
+        </div>
+      </Slate>
     </div>
   );
 };
 
 // 마크 버튼 컴포넌트
-const MarkButton: React.FC<{ format: string; icon: React.ComponentType<any> }> = ({ format, icon: Icon }) => {
+const MarkButton: React.FC<{ format: keyof Omit<Text, 'text'>; icon: React.ComponentType<any> }> = ({ format, icon: Icon }) => {
   const editor = useSlateStatic();
   const isActive = isMarkActive(editor, format);
   
@@ -160,7 +184,7 @@ const Element: React.FC<RenderElementProps> = ({ attributes, children, element }
   const style: React.CSSProperties = {};
   
   if (element.align) {
-    style.textAlign = element.align;
+    style.textAlign = element.align as React.CSSProperties['textAlign'];
   }
 
   switch (element.type) {
@@ -247,12 +271,12 @@ const Leaf: React.FC<RenderLeafProps> = ({ attributes, children, leaf }) => {
 };
 
 // 유틸리티 함수들
-const isMarkActive = (editor: Editor, format: string) => {
+const isMarkActive = (editor: Editor, format: keyof Omit<Text, 'text'>) => {
   const marks = Editor.marks(editor);
   return marks ? marks[format] === true : false;
 };
 
-const toggleMark = (editor: Editor, format: string) => {
+const toggleMark = (editor: Editor, format: keyof Omit<Text, 'text'>) => {
   const isActive = isMarkActive(editor, format);
   if (isActive) {
     Editor.removeMark(editor, format);
@@ -287,7 +311,7 @@ const toggleBlock = (editor: Editor, format: string) => {
     Transforms.setNodes(
       editor,
       { align: isActive ? undefined : format },
-      { match: n => Editor.isBlock(editor, n) }
+      { match: n => !Editor.isEditor(n) && SlateElement.isElement(n) }
     );
     return;
   }

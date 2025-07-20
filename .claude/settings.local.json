@@ -5,7 +5,10 @@
       "Bash(npm install:*)",
       "Bash(rm:*)",
       "Bash(find:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm start)",
+      "WebFetch(domain:navermaps.github.io)"
     ],
     "deny": []
   }

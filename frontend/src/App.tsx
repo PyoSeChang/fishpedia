@@ -8,13 +8,13 @@ import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import FishCollectionPage from './pages/fish/FishCollectionPage';
 import FishLogsPage from './pages/fish/FishLogsPage';
 import FishLogWritePage from './pages/fish/FishLogWritePage';
-import RankingPage from './pages/ranking/RankingPage';
 import CommunityPage from './pages/community/CommunityPage';
 import PostDetailPage from './pages/community/PostDetailPage';
 import PostWritePage from './pages/community/PostWritePage';
-import BoardListPage from './pages/board/BoardListPage';
 import BoardDetailPage from './pages/board/BoardDetailPage';
 import BoardWritePage from './pages/board/BoardWritePage';
+import BoardEditPage from './pages/board/BoardEditPage';
+import FishingSpotsPage from './pages/spots/FishingSpotsPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import ProfileEditPage from './pages/profile/ProfileEditPage';
 import AdminPage from './pages/auth/AdminPage';
@@ -36,18 +36,24 @@ function App() {
                 <Route path="write" element={<FishLogWritePage />} />
               </Route>
             </Route>
-            <Route path="ranking" element={<RankingPage />} />
+            <Route path="spots" element={<FishingSpotsPage />} />
             <Route path="community">
               <Route index element={<CommunityPage />} />
-              <Route path="post/:id" element={<PostDetailPage />} />
-              <Route path="write" element={<PostWritePage />} />
-            </Route>
-            <Route path="board">
-              <Route index element={<BoardListPage />} />
               <Route path=":id" element={<BoardDetailPage />} />
               <Route path="write" element={<BoardWritePage />} />
-              <Route path="edit/:id" element={<BoardWritePage />} />
+              <Route path="edit/:id" element={<BoardEditPage />} />
+              <Route path="post/:id" element={<PostDetailPage />} />
+              <Route path="post/write" element={<PostWritePage />} />
             </Route>
+            {/* Redirect old board routes to community */}
+            <Route path="board">
+              <Route index element={<CommunityPage />} />
+              <Route path=":id" element={<BoardDetailPage />} />
+              <Route path="write" element={<BoardWritePage />} />
+              <Route path="edit/:id" element={<BoardEditPage />} />
+            </Route>
+            {/* Redirect old ranking route to community */}
+            <Route path="ranking" element={<CommunityPage />} />
             <Route path="profile">
               <Route index element={<ProfilePage />} />
               <Route path="edit" element={<ProfileEditPage />} />

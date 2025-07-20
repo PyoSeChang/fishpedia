@@ -40,9 +40,8 @@ const Header: React.FC = () => {
     { path: '/', label: '홈', icon: '🏠' },
     { path: '/fish/collection', label: '도감', icon: '🐟' },
     { path: '/fish/logs', label: '낚시 일지', icon: '📋' },
-    { path: '/ranking', label: '랭킹', icon: '🏆' },
-    // { path: '/community', label: '커뮤니티', icon: '💬' },
-    { path: '/board', label: '게시판', icon: '📝' },
+    { path: '/spots', label: '낚시 스팟', icon: '📍' },
+    { path: '/community', label: '커뮤니티', icon: '💬' },
     { 
       path: userRole === 'ADMIN' ? '/admin' : '/profile', 
       label: userRole === 'ADMIN' ? '관리자' : '프로필', 
@@ -67,7 +66,8 @@ const Header: React.FC = () => {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center space-x-1 px-3 py-2 rounded-lg transition-colors ${
-                  location.pathname === item.path
+                  location.pathname === item.path || 
+                  (item.path === '/community' && (location.pathname.startsWith('/board') || location.pathname.startsWith('/ranking')))
                     ? 'bg-white bg-opacity-20 text-white'
                     : 'text-white hover:bg-white hover:bg-opacity-10'
                 }`}

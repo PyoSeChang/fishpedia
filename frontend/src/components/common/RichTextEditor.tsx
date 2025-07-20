@@ -7,6 +7,7 @@ interface RichTextEditorProps {
   placeholder?: string;
   height?: number;
   onImageUpload?: (file: File) => Promise<string>;
+  onImageUploadedToAlbum?: (file: File, imageUrl: string) => Promise<void>;
 }
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({
@@ -14,7 +15,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   onChange,
   placeholder = '내용을 입력해주세요...',
   height = 400,
-  onImageUpload
+  onImageUpload,
+  onImageUploadedToAlbum
 }) => {
   const editorRef = useRef<any>(null);
 
