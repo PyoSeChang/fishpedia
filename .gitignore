@@ -44,6 +44,11 @@ logs/
 # Ignore sensitive files
 secrets.*
 
+# FastAPI/Python ML models
+fastApi/*.pth
+fastApi/__pycache__/
+fastApi/.env
+
 ### STS ###
 .apt_generated
 .classpath

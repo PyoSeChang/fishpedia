@@ -10,10 +10,9 @@
       "Bash(npm start)",
       "WebFetch(domain:navermaps.github.io)",
       "Bash(python3:*)",
-      "Bash(pip3 install:*)",
-      "Bash(python:*)",
       "Bash(pip install:*)",
-      "Bash(mysql:*)"
+      "Bash(cp:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

@@ -52,7 +52,6 @@ file:
     base-url: http://localhost:8081
 
 # FastAPI 설정
-fastapi:
-  url: http://localhost:8000
-  timeout: 30000  # 30초
-  retry-count: 3
+app:
+  fastapi:
+    url: http://localhost:8000

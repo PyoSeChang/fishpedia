@@ -10,95 +10,87 @@ export interface FishType {
   season?: string[];
 }
 
-// 물고기 타입 상수 정의
+// 물고기 타입 상수 정의 (CNN 모델 기준 10종)
 export const FISH_TYPES: FishType[] = [
   {
     id: 1,
-    name: "붕어",
-    iconPath: "/icons/fish/crucian-carp.png",
-    avgLength: 15.0,
-    stdDeviation: 3.0,
-    rarityScore: 10,
-    description: "한국의 대표적인 민물고기",
-    habitat: "하천, 호수",
-    season: ["봄", "가을"]
+    name: "가자미",
+    iconPath: "/icons/fish/flounder.png",
+    avgLength: 25.0,
+    stdDeviation: 5.0,
+    rarityScore: 22
   },
   {
     id: 2,
-    name: "잉어",
-    iconPath: "/icons/fish/carp.png",
-    avgLength: 25.0,
-    stdDeviation: 5.0,
-    rarityScore: 15,
-    description: "큰 몸집의 민물고기",
-    habitat: "하천, 호수",
-    season: ["봄", "여름", "가을"]
-  },
-  {
-    id: 3,  
-    name: "송어",
-    iconPath: "/icons/fish/trout.png",
-    avgLength: 20.0,
-    stdDeviation: 4.0,
-    rarityScore: 25,
-    description: "깨끗한 물을 좋아하는 고급 어종",
-    habitat: "산간 계곡",
-    season: ["봄", "가을", "겨울"]
-  },
-  {
-    id: 4,
-    name: "농어",
-    iconPath: "/icons/fish/sea-bass.png",
-    avgLength: 30.0,
-    stdDeviation: 6.0,
-    rarityScore: 30,
-    description: "바다와 민물이 만나는 곳에서 서식",
-    habitat: "하구, 연안",
-    season: ["봄", "가을"]
-  },
-  {
-    id: 5,
-    name: "우럭",
-    iconPath: "/icons/fish/rockfish.png",
-    avgLength: 18.0,
-    stdDeviation: 3.5,
-    rarityScore: 20,
-    description: "바위틈에서 서식하는 바다고기",
-    habitat: "연안 암초",
-    season: ["봄", "여름", "가을"]
-  },
-  {
-    id: 6,
     name: "고등어",
     iconPath: "/icons/fish/mackerel.png",
     avgLength: 22.0,
     stdDeviation: 4.5,
-    rarityScore: 18,
-    description: "회로 유명한 대표적인 바다고기",
-    habitat: "연안, 외해",
-    season: ["봄", "가을"]
+    rarityScore: 18
+  },
+  {
+    id: 3,
+    name: "농어",
+    iconPath: "/icons/fish/sea-bass.png",
+    avgLength: 30.0,
+    stdDeviation: 6.0,
+    rarityScore: 30
+  },
+  {
+    id: 4,
+    name: "대구",
+    iconPath: "/icons/fish/cod.png",
+    avgLength: 35.0,
+    stdDeviation: 7.0,
+    rarityScore: 28
+  },
+  {
+    id: 5,
+    name: "도미",
+    iconPath: "/icons/fish/sea-bream.png",
+    avgLength: 26.0,
+    stdDeviation: 5.5,
+    rarityScore: 32
+  },
+  {
+    id: 6,
+    name: "민어",
+    iconPath: "/icons/fish/brown-croaker.png",
+    avgLength: 28.0,
+    stdDeviation: 6.0,
+    rarityScore: 35
   },
   {
     id: 7,
-    name: "갈치",
-    iconPath: "/icons/fish/hairtail.png",
-    avgLength: 35.0,
-    stdDeviation: 7.0,
-    rarityScore: 35,
-    description: "긴 몸체가 특징인 고급 어종",
-    habitat: "깊은 바다",
-    season: ["여름", "가을"]
+    name: "삼치",
+    iconPath: "/icons/fish/spanish-mackerel.png",
+    avgLength: 40.0,
+    stdDeviation: 8.0,
+    rarityScore: 38
   },
   {
     id: 8,
+    name: "연어",
+    iconPath: "/icons/fish/salmon.png",
+    avgLength: 45.0,
+    stdDeviation: 9.0,
+    rarityScore: 45
+  },
+  {
+    id: 9,
+    name: "우럭",
+    iconPath: "/icons/fish/rockfish.png",
+    avgLength: 18.0,
+    stdDeviation: 3.5,
+    rarityScore: 20
+  },
+  {
+    id: 10,
     name: "참돔",
     iconPath: "/icons/fish/red-snapper.png",
     avgLength: 28.0,
     stdDeviation: 5.5,
-    rarityScore: 40,
-    description: "붉은 빛이 도는 고급 어종",
-    habitat: "연안 암초",
-    season: ["봄", "여름", "가을"]
+    rarityScore: 40
   }
 ];
 

@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fishService } from '../../services/fishService';
+import FishClassifier from '../../components/fish/FishClassifier';
 
 const HomePage: React.FC = () => {
   const [serverStatus, setServerStatus] = useState<string>('연결 중...');
   const [fishCount, setFishCount] = useState<number>(0);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // 로그인 상태 확인
+    const token = localStorage.getItem('accessToken');
+    setIsAuthenticated(!!token);
+
     // 서버 상태 확인 (간단한 API 호출로 대체)
     fishService.getAllFish()
       .then((data: any) => {
@@ -26,6 +33,10 @@ const HomePage: React.FC = () => {
         console.error('물고기 데이터 로드 오류:', error);
       });
   }, []);
+
+  const handleLoginPrompt = () => {
+    navigate('/auth/login');
+  };
 
   return (
     <div className="space-y-12">
@@ -97,6 +108,12 @@ const HomePage: React.FC = () => {
           </Link>
         </div>
       </section>
+
+      {/* AI 물고기 분류기 섹션 */}
+      <FishClassifier 
+        isAuthenticated={isAuthenticated} 
+        onLoginPrompt={handleLoginPrompt} 
+      />
 
       {/* 서버 상태 섹션 */}
       <section className="bg-white p-8 rounded-xl shadow-lg">
