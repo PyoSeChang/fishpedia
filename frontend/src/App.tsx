@@ -42,8 +42,6 @@ function App() {
               <Route path=":id" element={<BoardDetailPage />} />
               <Route path="write" element={<BoardWritePage />} />
               <Route path="edit/:id" element={<BoardEditPage />} />
-              <Route path="post/:id" element={<PostDetailPage />} />
-              <Route path="post/write" element={<PostWritePage />} />
             </Route>
             {/* Redirect old board routes to community */}
             <Route path="board">

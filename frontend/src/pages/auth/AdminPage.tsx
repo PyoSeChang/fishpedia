@@ -64,6 +64,17 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleFishingForecast = async () => {
+    try {
+      const response = await fetch('/api/spots/fishing-forecast');
+      const data = await response.text();
+      alert('낚시 예보 데이터: ' + data);
+    } catch (error) {
+      console.error('낚시 예보 조회 실패:', error);
+      alert('낚시 예보 조회에 실패했습니다.');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -107,13 +118,21 @@ const AdminPage: React.FC = () => {
       {/* 관리자 기능 버튼 */}
       <div className="bg-white p-6 rounded-xl shadow-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-blue-600">물고기 관리</h2>
-          <button 
-            onClick={handleAddFish}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            ➕ 물고기 추가
-          </button>
+          <h2 className="text-2xl font-bold text-blue-600">관리자 기능</h2>
+          <div className="space-x-2">
+            <button 
+              onClick={handleAddFish}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              ➕ 물고기 추가
+            </button>
+            <button 
+              onClick={handleFishingForecast}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+            >
+              🎣 낚시 예보 조회
+            </button>
+          </div>
         </div>
       </div>
 

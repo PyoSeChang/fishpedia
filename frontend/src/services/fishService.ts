@@ -48,6 +48,32 @@ export interface FishLogCreateResponse {
   fishId: number;
 }
 
+export interface FishIdentificationResult {
+  fishType: string;
+  source: string;
+  message: string;
+}
+
+export interface FishMeasurementResult {
+  length: number | null;
+  unit: string;
+  source: string;
+  message: string;
+}
+
+export interface FishAnalysisResult {
+  fishType?: string;
+  length?: number;
+  confidence?: number;
+  source: string;
+  message: string;
+}
+
+export interface ScoreCalculationResult {
+  score: number;
+  source: string;
+}
+
 export const fishService = {
   // 물고기 목록 조회
   async getAllFish(): Promise<Fish[]> {
@@ -120,20 +146,29 @@ export const fishService = {
     return response.data;
   },
 
-  // 점수 계산
-  async calculateScore(fishId?: number, length?: number, image?: File): Promise<number> {
-    const formData = new FormData();
-    if (fishId) {
-      formData.append('fishId', fishId.toString());
+  // 점수 계산 (FastAPI 연동)
+  async calculateScore(fishType?: string, length?: number, location?: string): Promise<ScoreCalculationResult> {
+    const params = new URLSearchParams();
+    if (fishType) {
+      params.append('fishType', fishType);
     }
     if (length) {
-      formData.append('length', length.toString());
+      params.append('length', length.toString());
     }
-    if (image) {
-      formData.append('image', image);
+    if (location) {
+      params.append('location', location);
     }
 
-    const response = await api.post('/fish/calculate-score', formData, {
+    const response = await api.post(`/fish/calculate-score?${params.toString()}`);
+    return response.data;
+  },
+
+  // 물고기 식별 (FastAPI 연동)
+  async identifyFish(image: File): Promise<FishIdentificationResult> {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    const response = await api.post('/fish/identify', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -141,17 +176,35 @@ export const fishService = {
     return response.data;
   },
 
-  // 점수 계산 (GET 메서드로 테스트)
-  async calculateScoreGet(fishId?: number, length?: number): Promise<number> {
-    const params = new URLSearchParams();
-    if (fishId) {
-      params.append('fishId', fishId.toString());
-    }
-    if (length) {
-      params.append('length', length.toString());
-    }
+  // 물고기 크기 측정 (FastAPI 연동)
+  async measureFish(image: File): Promise<FishMeasurementResult> {
+    const formData = new FormData();
+    formData.append('image', image);
 
-    const response = await api.get(`/fish/calculate-score?${params.toString()}`);
+    const response = await api.post('/fish/measure', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // 물고기 종합 분석 (FastAPI 연동)
+  async analyzeFish(image: File): Promise<FishAnalysisResult> {
+    const formData = new FormData();
+    formData.append('image', image);
+
+    const response = await api.post('/fish/analyze', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // FastAPI 서버 상태 확인
+  async checkFastApiHealth(): Promise<{fastapi_healthy: boolean, message: string, timestamp: number}> {
+    const response = await api.get('/fish/fastapi/health');
     return response.data;
   },
 

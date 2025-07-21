@@ -8,7 +8,12 @@
       "Bash(rg:*)",
       "Bash(npm run build:*)",
       "Bash(npm start)",
-      "WebFetch(domain:navermaps.github.io)"
+      "WebFetch(domain:navermaps.github.io)",
+      "Bash(python3:*)",
+      "Bash(pip3 install:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(mysql:*)"
     ],
     "deny": []
   }

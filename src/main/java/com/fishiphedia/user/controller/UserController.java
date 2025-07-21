@@ -33,7 +33,9 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         try {
+            System.out.println("Request!!!!!!!!: "+request.toString());
             Map<String, Object> result = userService.login(request);
+
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
