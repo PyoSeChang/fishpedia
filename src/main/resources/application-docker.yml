@@ -1,0 +1,37 @@
+spring:
+  datasource:
+    url: jdbc:mysql://database:3306/fishiphedia?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    username: ${SPRING_DATASOURCE_USERNAME:fishuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:fishpassword}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+  
+  redis:
+    host: ${SPRING_REDIS_HOST:host.docker.internal}
+    port: ${SPRING_REDIS_PORT:6379}
+    timeout: 2000ms
+  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  port: 8081
+
+file:
+  upload-dir: /app/uploads
+
+logging:
+  level:
+    com.fishiphedia: info
+  pattern:
+    console: "[%d{yyyy-MM-dd HH:mm:ss}] [%thread] %-5level %logger{36} - %msg%n"

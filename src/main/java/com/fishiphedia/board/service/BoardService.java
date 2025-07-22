@@ -23,6 +23,9 @@ public interface BoardService {
 
     // 게시글 모아보기 (Board List, Pagaeable, 제목 or 내용 or 태그로 검색)
     Page<BoardResponse> getBoards(BoardCategory category, String keyword, Pageable pageable);
+    
+    // 게시글 모아보기 (향상된 검색 - 제목, 태그 분리 검색)
+    Page<BoardResponse> getBoards(BoardCategory category, String keyword, String title, String tags, Pageable pageable);
 
     // 댓글 달기
     CommentResponse createComment(Long boardId, CommentRequest request, String loginId);

@@ -7,9 +7,11 @@ import WriteButton from './WriteButton';
 interface BoardListProps {
   category?: BoardCategory;
   searchKeyword?: string;
+  searchTitle?: string;
+  searchTags?: string;
 }
 
-const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword }) => {
+const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTitle, searchTags }) => {
   const [boards, setBoards] = useState<BoardResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,12 +22,29 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword }) => {
   const fetchBoards = async (page: number = 0) => {
     try {
       setLoading(true);
-      const response: BoardListResponse = await boardService.getBoards(
-        category, 
-        searchKeyword, 
-        page, 
-        20
-      );
+      
+      let response: BoardListResponse;
+      
+      // 향상된 검색이 사용되는 경우
+      if (searchTitle || searchTags) {
+        response = await boardService.getBoardsAdvanced(
+          category,
+          searchKeyword,
+          searchTitle,
+          searchTags,
+          page,
+          20
+        );
+      } else {
+        // 기본 검색
+        response = await boardService.getBoards(
+          category, 
+          searchKeyword, 
+          page, 
+          20
+        );
+      }
+      
       setBoards(response.content);
       setTotalPages(response.totalPages);
       setTotalElements(response.totalElements);
@@ -40,7 +59,7 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword }) => {
 
   useEffect(() => {
     fetchBoards(0);
-  }, [category, searchKeyword]);
+  }, [category, searchKeyword, searchTitle, searchTags]);
 
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
@@ -51,10 +70,9 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword }) => {
   const getCategoryLabel = (category: BoardCategory) => {
     const labels = {
       [BoardCategory.NOTICE]: '공지사항',
+      [BoardCategory.FISH_LOG]: '낚시 일지',
       [BoardCategory.FREE]: '자유게시판',
-      [BoardCategory.QUESTION]: '질문게시판',
-      [BoardCategory.TIP]: '팁게시판',
-      [BoardCategory.REVIEW]: '리뷰게시판'
+      [BoardCategory.INQUIRY]: '문의사항'
     };
     return labels[category];
   };

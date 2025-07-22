@@ -53,4 +53,7 @@ public class FishLog {
     
     @Column(name = "img_path")
     private String imgPath;
+    
+    @Column(name = "certified", nullable = false)
+    private Boolean certified = false;
 } 

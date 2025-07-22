@@ -38,7 +38,9 @@ class SpotService {
   // 지역별 낚시터 조회
   async getSpotsByRegion(region: string): Promise<FishingSpot[]> {
     try {
-      const response = await api.get(`/spots/region/${region}`);
+      const response = await api.get('/spots/region', {
+        params: { region: region }
+      });
       return response.data;
     } catch (error) {
       console.error('지역별 낚시터 조회 실패:', error);
@@ -66,6 +68,26 @@ class SpotService {
       return response.data;
     } catch (error) {
       console.error('낚시 스팟 조회 실패:', error);
+      throw error;
+    }
+  }
+
+  // 세부 필터를 이용한 낚시터 검색
+  async searchSpotsWithDetailFilters(searchParams: {
+    region: string;
+    keyword?: string;
+    spotTypes?: SpotType[];
+    waterFacilityTypes?: WaterFacilityType[];
+    fishSpecies?: string[];
+    minUsageFee?: number;
+    maxUsageFee?: number;
+    convenienceFacilities?: string[];
+  }): Promise<FishingSpot[]> {
+    try {
+      const response = await api.post('/spots/search/detail', searchParams);
+      return response.data;
+    } catch (error) {
+      console.error('세부 필터 검색 실패:', error);
       throw error;
     }
   }

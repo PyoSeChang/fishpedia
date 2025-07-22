@@ -57,10 +57,9 @@ const BoardDetail: React.FC = () => {
   const getCategoryLabel = (category: BoardCategory) => {
     const labels = {
       [BoardCategory.NOTICE]: '공지사항',
+      [BoardCategory.FISH_LOG]: '낚시 일지',
       [BoardCategory.FREE]: '자유게시판',
-      [BoardCategory.QUESTION]: '질문게시판',
-      [BoardCategory.TIP]: '팁게시판',
-      [BoardCategory.REVIEW]: '리뷰게시판'
+      [BoardCategory.INQUIRY]: '문의사항'
     };
     return labels[category];
   };

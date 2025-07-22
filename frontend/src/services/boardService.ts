@@ -42,6 +42,27 @@ export const boardService = {
     return response.data;
   },
 
+  // 게시글 목록 조회 (향상된 검색)
+  getBoardsAdvanced: async (
+    category?: BoardCategory,
+    keyword?: string,
+    title?: string,
+    tags?: string,
+    page: number = 0,
+    size: number = 20
+  ): Promise<BoardListResponse> => {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (keyword) params.append('keyword', keyword);
+    if (title) params.append('title', title);
+    if (tags) params.append('tags', tags);
+    params.append('page', page.toString());
+    params.append('size', size.toString());
+
+    const response = await api.get(`/board?${params.toString()}`);
+    return response.data;
+  },
+
   // 댓글 생성
   createComment: async (boardId: number, commentData: CommentRequest): Promise<CommentResponse> => {
     const response = await api.post(`/board/${boardId}/comments`, commentData);

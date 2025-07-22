@@ -1,0 +1,64 @@
+services:
+  # MySQL 데이터베이스
+  database:
+    image: mysql:8.0
+    container_name: fishiphedia-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: fishiphedia
+      MYSQL_USER: fishuser
+      MYSQL_PASSWORD: fishpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database_migration.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fishiphedia-network
+    restart: unless-stopped
+
+  # Spring Boot 백엔드
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fishiphedia-backend
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://database:3306/fishiphedia
+      SPRING_DATASOURCE_USERNAME: fishuser
+      SPRING_DATASOURCE_PASSWORD: fishpassword
+      SPRING_REDIS_HOST: host.docker.internal
+      SPRING_REDIS_PORT: 6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - database
+    networks:
+      - fishiphedia-network
+    restart: unless-stopped
+    volumes:
+      - ./uploads:/app/uploads
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # React 프론트엔드
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fishiphedia-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - fishiphedia-network
+    restart: unless-stopped
+
+networks:
+  fishiphedia-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

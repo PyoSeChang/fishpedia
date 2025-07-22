@@ -33,4 +33,5 @@ public class SpotResponse {
     private String managementOffice;
     private LocalDate dataReferenceDate;
     private String region;
+    private Boolean fishingLevelInfo; // 바다 낚시 지수 정보 제공 여부
 }

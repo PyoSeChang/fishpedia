@@ -4,6 +4,14 @@ import com.fishiphedia.user.dto.LoginRequest;
 import com.fishiphedia.user.dto.RegisterRequest;
 import com.fishiphedia.user.entity.UserInfo;
 import com.fishiphedia.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +22,16 @@ import java.util.Map;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@Tag(name = "User", description = "사용자 관리 API")
 public class UserController {
 
     private final UserService userService;
 
-    // 회원가입
+    @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "회원가입 성공"),
+        @ApiResponse(responseCode = "400", description = "잘못된 요청")
+    })
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
         try {

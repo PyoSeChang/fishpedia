@@ -50,19 +50,19 @@ const FishLogWritePage: React.FC = () => {
       let score;
       try {
         score = await fishService.calculateScore(
-          selectedFish ? Number(selectedFish) : undefined,
+          selectedFish ? selectedFish.toString() : undefined,
           parseFloat(length),
-          selectedImage || undefined
+          place || undefined
         );
       } catch (error) {
         console.log('POST 메서드 실패, GET 메서드로 시도:', error);
         // POST가 실패하면 GET 메서드로 시도 (이미지 없이)
-        score = await fishService.calculateScoreGet(
-          selectedFish ? Number(selectedFish) : undefined,
+        score = await fishService.calculateScore(
+          selectedFish ? selectedFish.toString() : undefined,
           parseFloat(length)
         );
       }
-      setCalculatedScore(score);
+      setCalculatedScore(score.score);
     } catch (error) {
       console.error('점수 계산 실패:', error);
       setScoreCalculationError('점수 계산에 실패했습니다. 다시 시도해주세요.');

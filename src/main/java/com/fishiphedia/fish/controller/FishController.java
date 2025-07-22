@@ -21,6 +21,12 @@ import com.fishiphedia.fish.dto.FishRequest;
 import com.fishiphedia.fish.dto.FishResponse;
 import com.fishiphedia.fish.service.FishService;
 import com.fishiphedia.fish.service.FastApiService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 @Slf4j
+@Tag(name = "Fish", description = "물고기 정보 관리 API")
 public class FishController {
 
     private final FishService fishService;

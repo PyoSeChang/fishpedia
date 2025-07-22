@@ -15,6 +15,7 @@ import com.fishiphedia.fish.entity.FishLog;
 import com.fishiphedia.fish.repository.FishLogRepository;
 import com.fishiphedia.fish.repository.FishRepository;
 import com.fishiphedia.user.entity.User;
+import com.fishiphedia.ranking.service.RankingCollectionService;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ public class FishLogServiceImpl implements FishLogService {
     private final FishLogRepository fishLogRepository;
     private final FishRepository fishRepository;
     private final FishCollectionService fishCollectionService;
+    private final RankingCollectionService rankingCollectionService;
     private static final Logger log = LoggerFactory.getLogger(FishLogServiceImpl.class);
 
     @Override
@@ -49,6 +51,7 @@ public class FishLogServiceImpl implements FishLogService {
         fishLog.setPlace(request.getPlace());
         fishLog.setReview(request.getReview());
         fishLog.setImgPath(request.getImgPath());
+        fishLog.setCertified(false); // 기본값: 검증되지 않음
 
         FishLog savedFishLog = fishLogRepository.save(fishLog);
 
@@ -77,6 +80,7 @@ public class FishLogServiceImpl implements FishLogService {
         fishLog.setPlace(request.getPlace());
         fishLog.setReview(request.getReview());
         fishLog.setImgPath(request.getImgPath());
+        fishLog.setCertified(false); // 기본값: 검증되지 않음
 
         FishLog savedFishLog = fishLogRepository.save(fishLog);
 
@@ -113,6 +117,27 @@ public class FishLogServiceImpl implements FishLogService {
     public FishLog getFishLogById(Long id, User user) {
         return fishLogRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new RuntimeException("낚시 일지를 찾을 수 없습니다."));
+    }
+
+    @Override
+    @Transactional
+    public boolean verifyFishLog(Long fishLogId, User user) {
+        // 낚시 일지 조회
+        FishLog fishLog = fishLogRepository.findByIdAndUser(fishLogId, user)
+                .orElseThrow(() -> new RuntimeException("낚시 일지를 찾을 수 없습니다."));
+        
+        // TODO: 실제 검증 로직 구현 (AI 분석, 관리자 검토 등)
+        // 현재는 항상 true로 설정하고 certified 필드 업데이트
+        fishLog.setCertified(true);
+        FishLog savedFishLog = fishLogRepository.save(fishLog);
+        
+        // RankingCollection 업데이트
+        rankingCollectionService.updateRankingCollection(savedFishLog);
+        
+        log.info("FishLog 검증 완료 - ID: {}, User: {}, Fish: {}", 
+                fishLogId, user.getLoginId(), fishLog.getFish().getName());
+        
+        return true;
     }
 
     // 점수 계산 로직

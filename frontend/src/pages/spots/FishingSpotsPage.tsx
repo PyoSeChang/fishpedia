@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FishingSpot, SpotType, WaterFacilityType, SpotFilter, SPOT_TYPE_LABELS, WATER_FACILITY_TYPE_LABELS } from '../../types/SpotType';
 import { spotService } from '../../services/spotService';
 
@@ -9,36 +9,182 @@ declare global {
   }
 }
 
+// 바다 낚시 지수 테이블 컴포넌트
+const FishingLevelTable: React.FC<{ spot: FishingSpot }> = ({ spot }) => {
+  const [fishingLevel, setFishingLevel] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchFishingLevel = async () => {
+    if (fishingLevel) return; // 이미 로드된 경우
+
+    setLoading(true);
+    try {
+      // TODO: 실제 API 호출로 바다 낚시 지수 정보 가져오기
+      // const response = await fishingLevelService.getFishingLevel(spot.latitude, spot.longitude);
+      
+      // 임시 데이터 (실제로는 API에서 가져옴)
+      const mockData = {
+        weatherCondition: '맑음',
+        waveHeight: '0.5m',
+        windSpeed: '5m/s',
+        waterTemp: '18°C',
+        fishingIndex: '좋음',
+        recommendation: '오늘은 낚시하기 좋은 날씨입니다!'
+      };
+      
+      setTimeout(() => {
+        setFishingLevel(mockData);
+        setLoading(false);
+      }, 500);
+    } catch (error) {
+      console.error('바다 낚시 지수 로드 실패:', error);
+      setLoading(false);
+    }
+  };
+
+  // 컴포넌트가 마운트될 때 데이터 로드
+  useEffect(() => {
+    fetchFishingLevel();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span>🌊</span>
+          <h3 className="text-lg font-semibold text-blue-800">바다 낚시 지수</h3>
+        </div>
+        <div className="flex items-center justify-center py-8">
+          <div className="text-blue-600">로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!fishingLevel) {
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <span>🌊</span>
+          <h3 className="text-lg font-semibold text-blue-800">바다 낚시 지수</h3>
+        </div>
+        <div className="text-gray-500 text-center py-4">정보를 불러올 수 없습니다.</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="flex items-center gap-2 mb-4">
+        <span>🌊</span>
+        <h3 className="text-lg font-semibold text-blue-800">바다 낚시 지수</h3>
+      </div>
+      
+      {/* 날씨 정보 테이블 */}
+      <div className="bg-white rounded-lg border border-blue-200 overflow-hidden mb-4">
+        <div className="grid grid-cols-4 gap-0">
+          <div className="bg-blue-100 px-3 py-2 text-center text-sm font-medium text-blue-800 border-r border-blue-200">
+            날씨
+          </div>
+          <div className="bg-blue-100 px-3 py-2 text-center text-sm font-medium text-blue-800 border-r border-blue-200">
+            파도
+          </div>
+          <div className="bg-blue-100 px-3 py-2 text-center text-sm font-medium text-blue-800 border-r border-blue-200">
+            바람
+          </div>
+          <div className="bg-blue-100 px-3 py-2 text-center text-sm font-medium text-blue-800">
+            수온
+          </div>
+        </div>
+        <div className="grid grid-cols-4 gap-0">
+          <div className="px-3 py-2 text-center text-sm text-gray-700 border-r border-gray-200">
+            {fishingLevel.weatherCondition}
+          </div>
+          <div className="px-3 py-2 text-center text-sm text-gray-700 border-r border-gray-200">
+            {fishingLevel.waveHeight}
+          </div>
+          <div className="px-3 py-2 text-center text-sm text-gray-700 border-r border-gray-200">
+            {fishingLevel.windSpeed}
+          </div>
+          <div className="px-3 py-2 text-center text-sm text-gray-700">
+            {fishingLevel.waterTemp}
+          </div>
+        </div>
+      </div>
+      
+      {/* 낚시 지수 */}
+      <div className="bg-white rounded-lg border border-blue-200 p-3 mb-3">
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-gray-700">낚시 지수:</span>
+          <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+            fishingLevel.fishingIndex === '좋음' ? 'bg-green-100 text-green-800' :
+            fishingLevel.fishingIndex === '보통' ? 'bg-yellow-100 text-yellow-800' :
+            'bg-red-100 text-red-800'
+          }`}>
+            {fishingLevel.fishingIndex}
+          </span>
+        </div>
+      </div>
+      
+      {/* 추천 메시지 */}
+      <div className="bg-white rounded-lg border border-blue-200 p-3">
+        <div className="text-sm text-gray-700">
+          <span className="font-medium text-blue-700">🎯 추천:</span>
+          <p className="mt-1">{fishingLevel.recommendation}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const FishingSpotsPage: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
+  const detailRef = useRef<HTMLDivElement>(null); // 상세보기 영역 ref 추가
   const [map, setMap] = useState<any>(null);
   const [selectedSpot, setSelectedSpot] = useState<FishingSpot | null>(null);
   const [spots, setSpots] = useState<FishingSpot[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [filter, setFilter] = useState<SpotFilter>({
-    region: '경기도' // 기본값으로 경기도 설정
+    region: '경기' // 기본값으로 경기 설정
   });
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [markers, setMarkers] = useState<any[]>([]);
+  
+  // 세부 검색 드롭다운 상태
+  const [showDetailSearch, setShowDetailSearch] = useState<boolean>(false);
+  const [detailFilter, setDetailFilter] = useState({
+    spotTypes: [] as SpotType[],
+    waterFacilityTypes: [] as WaterFacilityType[],
+    fishSpecies: [] as string[],
+    minUsageFee: undefined as number | undefined,
+    maxUsageFee: undefined as number | undefined,
+    convenienceFacilities: [] as string[]
+  });
 
-  // 낚시터 데이터 로드 - 지역별로 로드
+  // 낚시터 데이터 로드 - 지역별로 로드 (기본 검색)
   useEffect(() => {
     const loadSpots = async () => {
+      if (!filter.region) {
+        setSpots([]);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        let data: FishingSpot[];
+        const data = await spotService.getSpotsByRegion(filter.region);
         
-        // 지역이 선택된 경우 해당 지역만 로드, 아니면 전체 로드
-        if (filter.region) {
-          data = await spotService.getSpotsByRegion(filter.region);
-        } else {
-          data = await spotService.getAllSpots();
-        }
+        // 임시: 바다 낚시터에 fishingLevelInfo 속성 추가 (실제로는 백엔드에서 처리)
+        const spotsWithFishingLevel = data.map(spot => ({
+          ...spot,
+          fishingLevelInfo: spot.fishingLevelInfo === true
+        }));
         
-        setSpots(data);
+        setSpots(spotsWithFishingLevel);
       } catch (error) {
         console.error('낚시터 데이터 로드 실패:', error);
+        setSpots([]);
       } finally {
         setLoading(false);
       }
@@ -47,63 +193,98 @@ const FishingSpotsPage: React.FC = () => {
     loadSpots();
   }, [filter.region]); // 지역이 변경될 때마다 데이터 재로드
 
-  // 지역별 지도 중심 좌표
+  // 세부 검색 실행
+  const handleDetailSearch = async () => {
+    if (!filter.region) return;
+
+    try {
+      setLoading(true);
+      const searchParams = {
+        region: filter.region,
+        keyword: searchKeyword || undefined,
+        spotTypes: detailFilter.spotTypes.length > 0 ? detailFilter.spotTypes : undefined,
+        waterFacilityTypes: detailFilter.waterFacilityTypes.length > 0 ? detailFilter.waterFacilityTypes : undefined,
+        fishSpecies: detailFilter.fishSpecies.length > 0 ? detailFilter.fishSpecies : undefined,
+        minUsageFee: detailFilter.minUsageFee,
+        maxUsageFee: detailFilter.maxUsageFee,
+        convenienceFacilities: detailFilter.convenienceFacilities.length > 0 ? detailFilter.convenienceFacilities : undefined
+      };
+
+      const data = await spotService.searchSpotsWithDetailFilters(searchParams);
+      
+      const spotsWithFishingLevel = data.map(spot => ({
+        ...spot,
+        fishingLevelInfo: spot.fishingLevelInfo === true
+      }));
+      
+      setSpots(spotsWithFishingLevel);
+      setShowDetailSearch(false); // 검색 후 드롭다운 닫기
+    } catch (error) {
+      console.error('세부 검색 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 지역별 지도 중심 좌표 (2글자 코드 기준)
   const getRegionCenter = (region?: string) => {
     const regionCenters: { [key: string]: { lat: number; lng: number } } = {
-      '경기도': { lat: 37.4138, lng: 127.5183 },
-      '서울특별시': { lat: 37.5665, lng: 126.9780 },
-      '인천광역시': { lat: 37.4563, lng: 126.7052 },
-      '강원도': { lat: 37.8228, lng: 128.1555 },
-      '충청북도': { lat: 36.6356, lng: 127.4917 },
-      '충청남도': { lat: 36.5184, lng: 126.8000 },
-      '전라북도': { lat: 35.7175, lng: 127.1530 },
-      '전라남도': { lat: 34.8679, lng: 126.9910 },
-      '경상북도': { lat: 36.4919, lng: 128.8889 },
-      '경상남도': { lat: 35.4606, lng: 128.2132 },
-      '제주특별자치도': { lat: 33.4996, lng: 126.5312 },
-      '부산광역시': { lat: 35.1796, lng: 129.0756 },
-      '대구광역시': { lat: 35.8714, lng: 128.6014 },
-      '울산광역시': { lat: 35.5384, lng: 129.3114 },
-      '광주광역시': { lat: 35.1595, lng: 126.8526 },
-      '대전광역시': { lat: 36.3504, lng: 127.3845 },
-      '세종특별자치시': { lat: 36.4875, lng: 127.2816 }
+      '경기': { lat: 37.4138, lng: 127.5183 },
+      '서울': { lat: 37.5665, lng: 126.9780 },
+      '인천': { lat: 37.4563, lng: 126.7052 },
+      '강원': { lat: 37.8228, lng: 128.1555 },
+      '충북': { lat: 36.6356, lng: 127.4917 },
+      '충남': { lat: 36.5184, lng: 126.8000 },
+      '전북': { lat: 35.7175, lng: 127.1530 },
+      '전남': { lat: 34.8679, lng: 126.9910 },
+      '경북': { lat: 36.4919, lng: 128.8889 },
+      '경남': { lat: 35.4606, lng: 128.2132 },
+      '제주': { lat: 33.4996, lng: 126.5312 },
+      '부산': { lat: 35.1796, lng: 129.0756 },
+      '대구': { lat: 35.8714, lng: 128.6014 },
+      '울산': { lat: 35.5384, lng: 129.3114 },
+      '광주': { lat: 35.1595, lng: 126.8526 },
+      '대전': { lat: 36.3504, lng: 127.3845 },
+      '세종': { lat: 36.4875, lng: 127.2816 }
     };
     
     return region ? regionCenters[region] : { lat: 37.5665, lng: 126.9780 }; // 기본값: 서울
   };
 
   // 필터링된 스팟들 (지역 데이터가 이미 필터링되어 있으므로 지역 필터는 제거)
-  const filteredSpots = spots.filter(spot => {
-    // 검색 키워드 필터
-    if (searchKeyword) {
-      const keyword = searchKeyword.toLowerCase();
-      const nameMatch = spot.name?.toLowerCase().includes(keyword);
-      const addressMatch = spot.roadAddress?.toLowerCase().includes(keyword) || spot.lotAddress?.toLowerCase().includes(keyword);
-      const fishMatch = spot.mainFishSpecies?.toLowerCase().includes(keyword);
-      const regionMatch = spot.region?.toLowerCase().includes(keyword);
-      
-      if (!nameMatch && !addressMatch && !fishMatch && !regionMatch) {
+  const filteredSpots = useMemo(() => {
+    return spots.filter(spot => {
+      // 검색 키워드 필터
+      if (searchKeyword) {
+        const keyword = searchKeyword.toLowerCase();
+        const nameMatch = spot.name?.toLowerCase().includes(keyword);
+        const addressMatch = spot.roadAddress?.toLowerCase().includes(keyword) || spot.lotAddress?.toLowerCase().includes(keyword);
+        const fishMatch = spot.mainFishSpecies?.toLowerCase().includes(keyword);
+        const regionMatch = spot.region?.toLowerCase().includes(keyword);
+        
+        if (!nameMatch && !addressMatch && !fishMatch && !regionMatch) {
+          return false;
+        }
+      }
+
+      // 낚시터 타입 필터
+      if (filter.spotType && spot.spotType !== filter.spotType) {
         return false;
       }
-    }
 
-    // 낚시터 타입 필터
-    if (filter.spotType && spot.spotType !== filter.spotType) {
-      return false;
-    }
+      // 수상시설물 타입 필터
+      if (filter.waterFacilityType && spot.waterFacilityType !== filter.waterFacilityType) {
+        return false;
+      }
 
-    // 수상시설물 타입 필터
-    if (filter.waterFacilityType && spot.waterFacilityType !== filter.waterFacilityType) {
-      return false;
-    }
+      // 어종 필터
+      if (filter.fishSpecies && (!spot.mainFishSpecies || !spot.mainFishSpecies.includes(filter.fishSpecies))) {
+        return false;
+      }
 
-    // 어종 필터
-    if (filter.fishSpecies && (!spot.mainFishSpecies || !spot.mainFishSpecies.includes(filter.fishSpecies))) {
-      return false;
-    }
-
-    return true;
-  });
+      return true;
+    });
+  }, [spots, searchKeyword, filter.spotType, filter.waterFacilityType, filter.fishSpecies]);
 
   // 마커 업데이트
   const updateMarkers = (naverMap: any, spotsToShow: FishingSpot[]) => {
@@ -279,6 +460,16 @@ const FishingSpotsPage: React.FC = () => {
       map.setCenter(new window.naver.maps.LatLng(spot.latitude, spot.longitude));
       map.setZoom(13);
     }
+    
+    // 상세보기 영역으로 스크롤
+    setTimeout(() => {
+      if (detailRef.current) {
+        detailRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100); // 상태 업데이트 후 스크롤
   };
 
   // 필터 핸들러
@@ -294,7 +485,7 @@ const FishingSpotsPage: React.FC = () => {
   };
 
   const clearFilters = () => {
-    setFilter({ region: '경기도' }); // 기본값 유지
+    setFilter({}); // 모든 필터 초기화
     setSearchKeyword('');
   };
 
@@ -307,31 +498,7 @@ const FishingSpotsPage: React.FC = () => {
           전국의 인기 낚시 스팟을 지도에서 확인하고 정보를 얻어보세요
         </p>
 
-        {/* 검색 */}
-        <div className="mb-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="스팟 이름, 어종, 시설로 검색하세요"
-              value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
-              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <span className="text-gray-400">🔍</span>
-            </div>
-            {searchKeyword && (
-              <button
-                onClick={() => setSearchKeyword('')}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* 주요 필터 - 지역 선택 */}
+        {/* 지역 선택 */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-lg">🗺️</span>
@@ -340,10 +507,10 @@ const FishingSpotsPage: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-9 gap-2">
             {[
-              '경기도', '서울특별시', '인천광역시', '강원도', '충청북도', 
-              '충청남도', '전라북도', '전라남도', '경상북도', '경상남도', 
-              '제주특별자치도', '부산광역시', '대구광역시', '울산광역시', 
-              '광주광역시', '대전광역시', '세종특별자치시'
+              '경기', '서울', '인천', '강원', '충북', 
+              '충남', '전북', '전남', '경북', '경남', 
+              '제주', '부산', '대구', '울산', 
+              '광주', '대전', '세종'
             ].map(region => (
               <button
                 key={region}
@@ -354,7 +521,7 @@ const FishingSpotsPage: React.FC = () => {
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
                 }`}
               >
-                {region.replace('특별시', '').replace('광역시', '').replace('특별자치도', '').replace('도', '')}
+                {region}
               </button>
             ))}
             <button
@@ -370,43 +537,242 @@ const FishingSpotsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 세부 필터 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {/* 낚시터 유형 필터 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">낚시터 유형</label>
-            <select
-              value={filter.spotType || ''}
-              onChange={(e) => handleFilterChange({ spotType: e.target.value as SpotType || undefined })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">전체</option>
-              {Object.entries(SPOT_TYPE_LABELS).map(([type, label]) => (
-                <option key={type} value={type}>{label}</option>
-              ))}
-            </select>
-          </div>
+        {/* 검색 */}
+        <div className="mb-6">
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="스팟 이름, 어종, 주소로 검색하세요"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+              />
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <span className="text-gray-400 text-xl">🔍</span>
+              </div>
+              {searchKeyword && (
+                <button
+                  onClick={() => setSearchKeyword('')}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  <span className="text-xl">✕</span>
+                </button>
+              )}
+            </div>
+            
+            {/* 세부 검색 드롭다운 버튼 */}
+            <div className="relative">
+              <button
+                onClick={() => setShowDetailSearch(!showDetailSearch)}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
+              >
+                <span>🔧</span>
+                세부 검색
+                <span className={`transition-transform ${showDetailSearch ? 'rotate-180' : ''}`}>
+                  ▼
+                </span>
+              </button>
 
-          {/* 어종 필터 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">어종</label>
-            <input
-              type="text"
-              value={filter.fishSpecies || ''}
-              onChange={(e) => handleFilterChange({ fishSpecies: e.target.value || undefined })}
-              placeholder="어종명 입력"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+              {/* 세부 검색 드롭다운 */}
+              {showDetailSearch && (
+                <div className="absolute top-full right-0 mt-2 w-[600px] bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">세부 검색 옵션</h3>
+                  
+                  {/* 낚시터 유형 */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>🏞️</span> 낚시터 유형
+                    </h4>
+                    <div className="flex flex-wrap gap-3">
+                      {Object.entries(SPOT_TYPE_LABELS).map(([type, label]) => (
+                        <label key={type} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={detailFilter.spotTypes.includes(type as SpotType)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  spotTypes: [...prev.spotTypes, type as SpotType]
+                                }));
+                              } else {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  spotTypes: prev.spotTypes.filter(t => t !== type)
+                                }));
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
 
-          {/* 필터 초기화 */}
-          <div className="flex items-end">
-            <button
-              onClick={clearFilters}
-              className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
-            >
-              필터 초기화
-            </button>
+                  {/* 수상시설 유형 */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>⛵</span> 수상시설 유형
+                    </h4>
+                    <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                      {Object.entries(WATER_FACILITY_TYPE_LABELS).map(([type, label]) => (
+                        <label key={type} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={detailFilter.waterFacilityTypes.includes(type as WaterFacilityType)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  waterFacilityTypes: [...prev.waterFacilityTypes, type as WaterFacilityType]
+                                }));
+                              } else {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  waterFacilityTypes: prev.waterFacilityTypes.filter(t => t !== type)
+                                }));
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 어종 */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>🐟</span> 주요 어종
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['농어', '광어', '도미', '참돔', '우럭', '감성돔', '방어', '고등어', '전어'].map(fish => (
+                        <label key={fish} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={detailFilter.fishSpecies.includes(fish)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  fishSpecies: [...prev.fishSpecies, fish]
+                                }));
+                              } else {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  fishSpecies: prev.fishSpecies.filter(f => f !== fish)
+                                }));
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">{fish}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 이용료 범위 */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>💰</span> 이용료 범위
+                    </h4>
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="number"
+                        placeholder="최소 금액"
+                        value={detailFilter.minUsageFee || ''}
+                        onChange={(e) => setDetailFilter(prev => ({
+                          ...prev,
+                          minUsageFee: e.target.value ? parseInt(e.target.value) : undefined
+                        }))}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-gray-500">~</span>
+                      <input
+                        type="number"
+                        placeholder="최대 금액"
+                        value={detailFilter.maxUsageFee || ''}
+                        onChange={(e) => setDetailFilter(prev => ({
+                          ...prev,
+                          maxUsageFee: e.target.value ? parseInt(e.target.value) : undefined
+                        }))}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-500">원</span>
+                    </div>
+                  </div>
+
+                  {/* 편의시설 */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <span>🏪</span> 편의시설
+                    </h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['화장실', '주차장', '매점', '식당', '낚시대여', '미끼판매', '숙박시설', '샤워장', '휴게소'].map(facility => (
+                        <label key={facility} className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={detailFilter.convenienceFacilities.includes(facility)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  convenienceFacilities: [...prev.convenienceFacilities, facility]
+                                }));
+                              } else {
+                                setDetailFilter(prev => ({
+                                  ...prev,
+                                  convenienceFacilities: prev.convenienceFacilities.filter(f => f !== facility)
+                                }));
+                              }
+                            }}
+                            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700">{facility}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 버튼들 */}
+                  <div className="flex justify-between items-center pt-4 border-t">
+                    <button
+                      onClick={() => {
+                        setDetailFilter({
+                          spotTypes: [],
+                          waterFacilityTypes: [],
+                          fishSpecies: [],
+                          minUsageFee: undefined,
+                          maxUsageFee: undefined,
+                          convenienceFacilities: []
+                        });
+                      }}
+                      className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                    >
+                      초기화
+                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setShowDetailSearch(false)}
+                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      >
+                        취소
+                      </button>
+                      <button
+                        onClick={handleDetailSearch}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        검색
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -420,22 +786,70 @@ const FishingSpotsPage: React.FC = () => {
               <h2 className="text-lg font-semibold text-gray-800">낚시 스팟 지도</h2>
               <p className="text-sm text-gray-600">마커를 클릭하면 상세 정보를 확인할 수 있습니다</p>
             </div>
-            <div 
-              ref={mapRef} 
-              className="w-full h-96 lg:h-[500px]"
-              style={{ background: '#e5e7eb' }}
-            >
-              {!window.naver && (
-                <div className="flex items-center justify-center h-full">
-                  <div className="text-center">
-                    <div className="text-4xl mb-4">🗺️</div>
-                    <p className="text-gray-600">지도를 로딩하는 중...</p>
-                    <p className="text-sm text-gray-500 mt-2">
-                      네이버 지도 API 키가 필요합니다
-                    </p>
+            <div className="relative w-full h-96 lg:h-[500px]">
+              <div 
+                ref={mapRef} 
+                className="w-full h-full"
+                style={{ background: '#e5e7eb' }}
+              >
+                {!window.naver && (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="text-4xl mb-4">🗺️</div>
+                      <p className="text-gray-600">지도를 로딩하는 중...</p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        네이버 지도 API 키가 필요합니다
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {/* 마커 범례 */}
+              <div className="absolute top-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 z-[1000]">
+                <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1">
+                  <span>📍</span>
+                  마커 범례
+                </h4>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
+                      style={{ backgroundColor: '#3B82F6' }}
+                    >
+                      🌊
+                    </div>
+                    <span className="text-gray-700">바다</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
+                      style={{ backgroundColor: '#10B981' }}
+                    >
+                      🏞️
+                    </div>
+                    <span className="text-gray-700">저수지</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
+                      style={{ backgroundColor: '#F59E0B' }}
+                    >
+                      🎣
+                    </div>
+                    <span className="text-gray-700">평지</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
+                      style={{ backgroundColor: '#6B7280' }}
+                    >
+                      📍
+                    </div>
+                    <span className="text-gray-700">기타</span>
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -454,9 +868,9 @@ const FishingSpotsPage: React.FC = () => {
             ) : filteredSpots.length === 0 ? (
               <div className="text-center py-8">
                 <div className="text-4xl mb-4">🎣</div>
-                <p className="text-gray-500 mb-2">검색 결과가 없습니다</p>
+                <p className="text-gray-500 mb-2">{spots.length === 0 ? '해당 지역에 낚시터 정보가 없습니다' : '검색 결과가 없습니다'}</p>
                 <p className="text-sm text-gray-400">
-                  다른 키워드로 검색해보거나 필터를 변경해보세요
+                  {spots.length === 0 ? '다른 지역을 선택해보세요' : '다른 키워드로 검색해보거나 필터를 변경해보세요'}
                 </p>
                 <button
                   onClick={clearFilters}
@@ -474,54 +888,44 @@ const FishingSpotsPage: React.FC = () => {
                   selectedSpot?.id === spot.id ? 'ring-2 ring-blue-500' : ''
                 }`}
               >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-gray-800">{spot.name}</h3>
-                  <div className="flex gap-1">
-                    {spot.spotType && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {SPOT_TYPE_LABELS[spot.spotType]}
-                      </span>
-                    )}
-                    {spot.region && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        {spot.region}
-                      </span>
-                    )}
-                  </div>
+                <div className="flex justify-between items-start mb-3">
+                  <h3 className="font-semibold text-gray-800 text-lg">{spot.name}</h3>
+                  {spot.spotType && (
+                    <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      {SPOT_TYPE_LABELS[spot.spotType]}
+                    </span>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
-                  {spot.roadAddress && (
+                  {(spot.roadAddress || spot.lotAddress) && (
                     <div>
                       <span className="text-xs font-medium text-gray-500">주소:</span>
-                      <p className="text-sm text-gray-600">{spot.roadAddress}</p>
+                      <p className="text-sm text-gray-600">{spot.roadAddress || spot.lotAddress}</p>
                     </div>
                   )}
                   
                   {spot.mainFishSpecies && (
                     <div>
-                      <span className="text-xs font-medium text-gray-500">주요어종:</span>
-                      <p className="text-sm text-gray-600">🐟 {spot.mainFishSpecies}</p>
+                      <span className="text-xs font-medium text-gray-500">어종:</span>
+                      <div className="flex flex-wrap gap-1 mt-1">
+                        {spot.mainFishSpecies
+                          .split(/[,\s\d+등]+/)
+                          .map(species => species.trim())
+                          .filter(species => 
+                            species && 
+                            species.length > 1 && 
+                            !species.match(/^\d+$/) && 
+                            !['등', '+', ',', ' '].includes(species)
+                          )
+                          .map((species, index) => (
+                            <span key={index} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded">
+                              {species}
+                            </span>
+                          ))}
+                      </div>
                     </div>
                   )}
-                  
-                  {spot.waterFacilityType && (
-                    <div>
-                      <span className="text-xs font-medium text-gray-500">시설유형:</span>
-                      <span className="ml-1 px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
-                        {WATER_FACILITY_TYPE_LABELS[spot.waterFacilityType]}
-                      </span>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between">
-                    {spot.usageFee && (
-                      <span className="text-sm text-gray-600">💰 {spot.usageFee}</span>
-                    )}
-                    <button className="text-blue-500 text-sm font-medium hover:text-blue-700">
-                      상세보기 →
-                    </button>
-                  </div>
                 </div>
               </div>
             ))
@@ -532,7 +936,7 @@ const FishingSpotsPage: React.FC = () => {
 
       {/* 선택된 스팟 상세 정보 */}
       {selectedSpot && (
-        <div className="mt-6 bg-white rounded-lg shadow-lg p-6">
+        <div ref={detailRef} className="mt-6 bg-white rounded-lg shadow-lg p-6">
           <div className="flex justify-between items-start mb-4">
             <h2 className="text-xl font-bold text-gray-800">{selectedSpot.name}</h2>
             <button
@@ -543,24 +947,15 @@ const FishingSpotsPage: React.FC = () => {
             </button>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-semibold text-gray-700 mb-2">낚시터 정보</h3>
-              
-              <div className="space-y-3">
+          <div className="space-y-4 text-left">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 {selectedSpot.spotType && (
                   <div>
                     <span className="font-medium text-gray-700">유형:</span>
                     <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 text-sm rounded">
                       {SPOT_TYPE_LABELS[selectedSpot.spotType]}
                     </span>
-                  </div>
-                )}
-                
-                {selectedSpot.region && (
-                  <div>
-                    <span className="font-medium text-gray-700">지역:</span>
-                    <span className="ml-2">{selectedSpot.region}</span>
                   </div>
                 )}
                 
@@ -573,37 +968,35 @@ const FishingSpotsPage: React.FC = () => {
                 
                 {selectedSpot.phoneNumber && (
                   <div>
-                    <span className="font-medium text-gray-700">연락처:</span>
-                    <span className="ml-2">{selectedSpot.phoneNumber}</span>
+                    <span className="font-medium text-gray-700">전화번호:</span>
+                    <span className="ml-2 text-gray-600">{selectedSpot.phoneNumber}</span>
                   </div>
                 )}
                 
-                {selectedSpot.waterArea && (
+                {selectedSpot.mainFishSpecies && (
                   <div>
-                    <span className="font-medium text-gray-700">수면적:</span>
-                    <span className="ml-2">{selectedSpot.waterArea}㎡</span>
-                  </div>
-                )}
-                
-                {selectedSpot.maxCapacity && (
-                  <div>
-                    <span className="font-medium text-gray-700">최대수용인원:</span>
-                    <span className="ml-2">{selectedSpot.maxCapacity}명</span>
+                    <span className="font-medium text-gray-700 block mb-2">어종:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedSpot.mainFishSpecies
+                        .split(/[,\s\d+등]+/)
+                        .map(species => species.trim())
+                        .filter(species => 
+                          species && 
+                          species.length > 1 && 
+                          !species.match(/^\d+$/) && 
+                          !['등', '+', ',', ' '].includes(species)
+                        )
+                        .map((species, index) => (
+                          <span key={index} className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                            {species}
+                          </span>
+                        ))}
+                    </div>
                   </div>
                 )}
               </div>
-            </div>
-            
-            <div>
-              <h3 className="font-semibold text-gray-700 mb-2">이용 안내</h3>
-              <div className="space-y-3">
-                {selectedSpot.mainFishSpecies && (
-                  <div>
-                    <span className="font-medium text-gray-700">주요어종:</span>
-                    <p className="text-gray-600 mt-1">🐟 {selectedSpot.mainFishSpecies}</p>
-                  </div>
-                )}
-                
+              
+              <div className="space-y-4">
                 {selectedSpot.waterFacilityType && (
                   <div>
                     <span className="font-medium text-gray-700">수상시설:</span>
@@ -616,49 +1009,74 @@ const FishingSpotsPage: React.FC = () => {
                 {selectedSpot.usageFee && (
                   <div>
                     <span className="font-medium text-gray-700">이용요금:</span>
-                    <span className="ml-2">💰 {selectedSpot.usageFee}</span>
+                    <span className="ml-2 text-gray-600">💰 {selectedSpot.usageFee}</span>
                   </div>
                 )}
                 
-                {selectedSpot.keyPoints && (
+                {selectedSpot.waterArea && (
                   <div>
-                    <span className="font-medium text-gray-700">주요포인트:</span>
-                    <p className="text-gray-600 mt-1">{selectedSpot.keyPoints}</p>
+                    <span className="font-medium text-gray-700">수면적:</span>
+                    <span className="ml-2 text-gray-600">{selectedSpot.waterArea}㎡</span>
                   </div>
                 )}
                 
-                {selectedSpot.safetyFacilities && (
+                {selectedSpot.maxCapacity && (
                   <div>
-                    <span className="font-medium text-gray-700">안전시설:</span>
-                    <p className="text-gray-600 mt-1">{selectedSpot.safetyFacilities}</p>
-                  </div>
-                )}
-                
-                {selectedSpot.convenienceFacilities && (
-                  <div>
-                    <span className="font-medium text-gray-700">편의시설:</span>
-                    <p className="text-gray-600 mt-1">{selectedSpot.convenienceFacilities}</p>
-                  </div>
-                )}
-                
-                {selectedSpot.nearbyAttractions && (
-                  <div>
-                    <span className="font-medium text-gray-700">주변관광지:</span>
-                    <p className="text-gray-600 mt-1">{selectedSpot.nearbyAttractions}</p>
-                  </div>
-                )}
-                
-                {selectedSpot.managementOffice && (
-                  <div>
-                    <span className="font-medium text-gray-700">관리기관:</span>
-                    <span className="ml-2">{selectedSpot.managementOffice}</span>
-                    {selectedSpot.managementPhone && (
-                      <span className="text-gray-600"> ({selectedSpot.managementPhone})</span>
-                    )}
+                    <span className="font-medium text-gray-700">최대수용인원:</span>
+                    <span className="ml-2 text-gray-600">{selectedSpot.maxCapacity}명</span>
                   </div>
                 )}
               </div>
             </div>
+            
+            {/* 편의시설 */}
+            {selectedSpot.convenienceFacilities && (
+              <div>
+                <span className="font-medium text-gray-700 block mb-2">편의시설:</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSpot.convenienceFacilities.split(/[,\s]+/).filter(facility => facility.trim()).map((facility, index) => (
+                    <span key={index} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                      {facility.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* 안전시설 */}
+            {selectedSpot.safetyFacilities && (
+              <div>
+                <span className="font-medium text-gray-700 block mb-2">안전시설:</span>
+                <div className="flex flex-wrap gap-2">
+                  {selectedSpot.safetyFacilities.split(/[,\s]+/).filter(facility => facility.trim()).map((facility, index) => (
+                    <span key={index} className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      {facility.trim()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {selectedSpot.keyPoints && (
+              <div>
+                <span className="font-medium text-gray-700">주요포인트:</span>
+                <p className="text-gray-600 mt-1">{selectedSpot.keyPoints}</p>
+              </div>
+            )}
+            
+            {selectedSpot.nearbyAttractions && (
+              <div>
+                <span className="font-medium text-gray-700">주변관광지:</span>
+                <p className="text-gray-600 mt-1">{selectedSpot.nearbyAttractions}</p>
+              </div>
+            )}
+            
+            {/* 바다 낚시 지수 테이블 */}
+            {selectedSpot.fishingLevelInfo === true && (
+              <div className="mt-6">
+                <FishingLevelTable spot={selectedSpot} />
+              </div>
+            )}
           </div>
         </div>
       )}

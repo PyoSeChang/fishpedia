@@ -1,9 +1,8 @@
 export enum BoardCategory {
   NOTICE = 'NOTICE',
+  FISH_LOG = 'FISH_LOG',
   FREE = 'FREE',
-  QUESTION = 'QUESTION',
-  TIP = 'TIP',
-  REVIEW = 'REVIEW'
+  INQUIRY = 'INQUIRY'
 }
 
 export interface BoardRequest {

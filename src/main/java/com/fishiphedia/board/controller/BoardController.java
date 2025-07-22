@@ -66,8 +66,10 @@ public class BoardController {
     public ResponseEntity<Page<BoardResponse>> getBoards(
             @RequestParam(required = false) BoardCategory category,
             @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String tags,
             @PageableDefault(size = 20, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<BoardResponse> response = boardService.getBoards(category, keyword, pageable);
+        Page<BoardResponse> response = boardService.getBoards(category, keyword, title, tags, pageable);
         return ResponseEntity.ok(response);
     }
 

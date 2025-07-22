@@ -8,6 +8,10 @@ import com.fishiphedia.fish.entity.FishCollection;
 import com.fishiphedia.fish.repository.FishCollectionRepository;
 import com.fishiphedia.fish.entity.Fish;
 import com.fishiphedia.fish.repository.FishRepository;
+import com.fishiphedia.fish.repository.FishLogRepository;
+import com.fishiphedia.user.entity.User;
+import com.fishiphedia.ranking.entity.RankingCollection;
+import com.fishiphedia.ranking.repository.RankingCollectionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,76 +29,75 @@ public class RankingServiceImpl implements RankingService {
     private final UserInfoRepository userInfoRepository;
     private final FishCollectionRepository fishCollectionRepository;
     private final FishRepository fishRepository;
+    private final RankingCollectionRepository rankingCollectionRepository;
 
-    // 낚시꾼 전체 랭킹 (UserInfo.totalScore)
+    // 낚시꾼 전체 랭킹 (RankingCollection 기반, certified=true만)
     @Override
     public List<FisherRankingResponse> getFisherRanking() {
-        return userInfoRepository.findAll().stream()
-                .sorted(Comparator.comparingInt((UserInfo u) -> u.getTotalScore() != null ? u.getTotalScore() : 0).reversed())
-                .map(u -> {
+        List<Object[]> results = rankingCollectionRepository.findUserTotalScoreRanking();
+        return results.stream()
+                .map(result -> {
+                    User user = (User) result[0];
+                    Long totalScore = (Long) result[1];
+                    
                     FisherRankingResponse dto = new FisherRankingResponse();
-                    dto.setUserId(u.getUser().getId());
-                    dto.setName(u.getName());
-                    dto.setTotalScore(u.getTotalScore() != null ? u.getTotalScore() : 0);
+                    dto.setUserId(user.getId());
+                    dto.setName(user.getUserInfo() != null ? user.getUserInfo().getName() : user.getLoginId());
+                    dto.setTotalScore(totalScore != null ? totalScore.intValue() : 0);
                     return dto;
                 })
                 .collect(Collectors.toList());
     }
 
-    // FishCollection 전체 랭킹 (totalScore)
+    // RankingCollection 전체 랭킹 (totalScore, certified=true만)
     @Override
     public List<FishCollectionRankingResponse> getFishCollectionRanking() {
-        return fishCollectionRepository.findAll().stream()
-                .sorted(Comparator.comparingInt((FishCollection fc) -> fc.getTotalScore() != null ? fc.getTotalScore() : 0).reversed())
-                .map(fc -> {
+        return rankingCollectionRepository.findAllByOrderByTotalScoreDesc().stream()
+                .map(rc -> {
                     FishCollectionRankingResponse dto = new FishCollectionRankingResponse();
-                    dto.setUserId(fc.getUser().getId());
-                    dto.setName(fc.getUser().getUserInfo().getName());
-                    dto.setFishId(fc.getFish().getId());
-                    dto.setFishName(fc.getFish().getName());
-                    dto.setTotalScore(fc.getTotalScore() != null ? fc.getTotalScore() : 0);
-                    dto.setHighestScore(fc.getHighestScore());
-                    dto.setHighestLength(fc.getHighestLength());
+                    dto.setUserId(rc.getUser().getId());
+                    dto.setName(rc.getUser().getUserInfo() != null ? rc.getUser().getUserInfo().getName() : rc.getUser().getLoginId());
+                    dto.setFishId(rc.getFish().getId());
+                    dto.setFishName(rc.getFish().getName());
+                    dto.setTotalScore(rc.getTotalScore());
+                    dto.setHighestScore(rc.getHighestScore());
+                    dto.setHighestLength(rc.getHighestLength());
                     return dto;
                 })
                 .collect(Collectors.toList());
     }
 
-    // 물고기별 전체 랭킹 (highestScore, 전체 물고기)
+    // 물고기별 전체 랭킹 (highestScore, 전체 물고기, certified=true만)
     @Override
     public List<FishCollectionRankingResponse> getFishRankingAllFish() {
-        List<FishCollectionRankingResponse> result = new ArrayList<>();
-        List<Fish> fishList = fishRepository.findAll();
-        for (Fish fish : fishList) {
-            List<FishCollection> collections = fishCollectionRepository.findByFishIdOrderByHighestScoreDesc(fish.getId());
-            for (FishCollection fc : collections) {
-                FishCollectionRankingResponse dto = new FishCollectionRankingResponse();
-                dto.setUserId(fc.getUser().getId());
-                dto.setName(fc.getUser().getUserInfo().getName());
-                dto.setFishId(fish.getId());
-                dto.setFishName(fish.getName());
-                dto.setTotalScore(fc.getTotalScore());
-                dto.setHighestScore(fc.getHighestScore());
-                dto.setHighestLength(fc.getHighestLength());
-                result.add(dto);
-            }
-        }
-        return result;
+        return rankingCollectionRepository.findAllByOrderByHighestScoreDesc().stream()
+                .map(rc -> {
+                    FishCollectionRankingResponse dto = new FishCollectionRankingResponse();
+                    dto.setUserId(rc.getUser().getId());
+                    dto.setName(rc.getUser().getUserInfo() != null ? rc.getUser().getUserInfo().getName() : rc.getUser().getLoginId());
+                    dto.setFishId(rc.getFish().getId());
+                    dto.setFishName(rc.getFish().getName());
+                    dto.setTotalScore(rc.getTotalScore());
+                    dto.setHighestScore(rc.getHighestScore());
+                    dto.setHighestLength(rc.getHighestLength());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
-    // 특정 물고기별 랭킹 (highestScore)
+    // 특정 물고기별 랭킹 (highestScore, certified=true만)
     @Override
     public List<FishCollectionRankingResponse> getFishRankingByFish(Long fishId) {
-        return fishCollectionRepository.findByFishIdOrderByHighestScoreDesc(fishId).stream()
-                .map(fc -> {
+        return rankingCollectionRepository.findByFishIdOrderByHighestScoreDesc(fishId).stream()
+                .map(rc -> {
                     FishCollectionRankingResponse dto = new FishCollectionRankingResponse();
-                    dto.setUserId(fc.getUser().getId());
-                    dto.setName(fc.getUser().getUserInfo().getName());
-                    dto.setFishId(fc.getFish().getId());
-                    dto.setFishName(fc.getFish().getName());
-                    dto.setTotalScore(fc.getTotalScore());
-                    dto.setHighestScore(fc.getHighestScore());
-                    dto.setHighestLength(fc.getHighestLength());
+                    dto.setUserId(rc.getUser().getId());
+                    dto.setName(rc.getUser().getUserInfo() != null ? rc.getUser().getUserInfo().getName() : rc.getUser().getLoginId());
+                    dto.setFishId(rc.getFish().getId());
+                    dto.setFishName(rc.getFish().getName());
+                    dto.setTotalScore(rc.getTotalScore());
+                    dto.setHighestScore(rc.getHighestScore());
+                    dto.setHighestLength(rc.getHighestLength());
                     return dto;
                 })
                 .collect(Collectors.toList());

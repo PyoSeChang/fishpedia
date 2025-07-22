@@ -19,7 +19,7 @@ class FishingSpotMigration:
             'user': 'root',
             'password': '1234', 
             'database': 'fishpedia',
-            'charset': 'utf8mb4'
+            'charset': 'utf8'
         }
     
     def fetch_fishing_spots(self, gubun):

@@ -32,6 +32,7 @@ logging:
 
 server:
   port: 8081
+  address: 0.0.0.0  # 모든 네트워크 인터페이스에서 접근 가능
   servlet:
     encoding:
       charset: UTF-8

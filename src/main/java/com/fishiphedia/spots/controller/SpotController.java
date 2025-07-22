@@ -1,5 +1,6 @@
 package com.fishiphedia.spots.controller;
 
+import com.fishiphedia.spots.dto.SpotDetailSearchRequest;
 import com.fishiphedia.spots.dto.SpotResponse;
 import com.fishiphedia.spots.dto.SpotSearchRequest;
 import com.fishiphedia.spots.entity.SpotType;
@@ -9,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import jakarta.validation.Valid;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +55,17 @@ public class SpotController {
         }
     }
 
+    @PostMapping("/search/detail")
+    public ResponseEntity<List<SpotResponse>> searchSpotsWithDetailFilters(@RequestBody @Valid SpotDetailSearchRequest request) {
+        try {
+            List<SpotResponse> spots = spotService.searchSpotsWithDetailFilters(request);
+            return ResponseEntity.ok(spots);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
     @GetMapping("/type/{spotType}")
     public ResponseEntity<List<SpotResponse>> getSpotsByType(@PathVariable SpotType spotType) {
         try {
@@ -61,12 +76,20 @@ public class SpotController {
         }
     }
 
-    @GetMapping("/region/{region}")
-    public ResponseEntity<List<SpotResponse>> getSpotsByRegion(@PathVariable String region) {
+    @GetMapping("/region")
+    public ResponseEntity<List<SpotResponse>> getSpotsByRegion(@RequestParam String region) {
         try {
-            List<SpotResponse> spots = spotService.getSpotsByRegion(region);
+            // URL 디코딩 처리
+            String decodedRegion = URLDecoder.decode(region, StandardCharsets.UTF_8);
+            System.out.println("Original region parameter: " + region);
+            System.out.println("Decoded region parameter: " + decodedRegion);
+            
+            List<SpotResponse> spots = spotService.getSpotsByRegion(decodedRegion);
+            System.out.println("Found " + spots.size() + " spots for region: " + decodedRegion);
+            
             return ResponseEntity.ok(spots);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }

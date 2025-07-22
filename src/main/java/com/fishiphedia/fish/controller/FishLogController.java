@@ -130,6 +130,19 @@ public class FishLogController {
         return ResponseEntity.ok(convertToResponse(fishLog));
     }
 
+    // 낚시 일지 검증 API
+    @PostMapping("/{id}/verify")
+    public ResponseEntity<Boolean> verifyFishLog(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByLoginId(authentication.getName());
+        
+        // TODO: 실제 검증 로직 구현
+        // 현재는 항상 true 반환
+        boolean isVerified = fishLogService.verifyFishLog(id, user);
+        
+        return ResponseEntity.ok(isVerified);
+    }
+
     private FishLogResponse convertToResponse(FishLog fishLog) {
         return FishLogResponse.builder()
                 .id(fishLog.getId())
@@ -141,6 +154,7 @@ public class FishLogController {
                 .place(fishLog.getPlace())
                 .review(fishLog.getReview())
                 .imgPath(fishLog.getImgPath())
+                .certified(fishLog.getCertified())
                 .build();
     }
 } 

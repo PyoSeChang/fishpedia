@@ -12,7 +12,12 @@
       "Bash(python3:*)",
       "Bash(pip install:*)",
       "Bash(cp:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(ss:*)",
+      "Bash(cat:*)",
+      "Bash(./gradlew:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

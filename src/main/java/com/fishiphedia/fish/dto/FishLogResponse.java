@@ -23,4 +23,5 @@ public class FishLogResponse {
     private String place;
     private String review;
     private String imgPath;
+    private Boolean certified;
 }

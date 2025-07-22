@@ -1,0 +1,21 @@
+# Spring Boot .dockerignore
+node_modules/
+frontend/
+*.log
+target/
+.gradle/
+build/
+!build/libs/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore

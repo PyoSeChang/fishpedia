@@ -4,6 +4,7 @@ import BoardList from '../../components/board/BoardList';
 import { BoardCategory } from '../../types/BoardType';
 import { rankingService, FishCollectionRanking } from '../../services/rankingService';
 import FishSelector from '../../components/common/FishSelector';
+import TaggableInput from '../../components/common/TaggableInput';
 
 type ViewMode = 'board' | 'ranking';
 type RankingType = 'fisher' | 'fish';
@@ -13,7 +14,7 @@ const CommunityPage: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('board');
   
   // Board states
-  const [searchKeyword, setSearchKeyword] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<BoardCategory | undefined>(
     searchParams.get('category') as BoardCategory || undefined
   );
@@ -25,33 +26,64 @@ const CommunityPage: React.FC = () => {
   const [rankingLoading, setRankingLoading] = useState(false);
 
   // Board functions
+  const parseSearchInput = (input: string) => {
+    const hashtagRegex = /#(\w+)/g;
+    const tags: string[] = [];
+    let match;
+    
+    // #태그 추출
+    while ((match = hashtagRegex.exec(input)) !== null) {
+      tags.push(match[1]);
+    }
+    
+    // #태그 제거한 나머지 텍스트를 제목으로 사용
+    const title = input.replace(hashtagRegex, '').trim();
+    
+    return { title, tags };
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchKeyword.trim()) {
-      setSearchParams({ 
-        ...(selectedCategory && { category: selectedCategory }),
-        keyword: searchKeyword.trim() 
-      });
-    } else {
-      setSearchParams(selectedCategory ? { category: selectedCategory } : {});
+    const params = new URLSearchParams();
+    
+    if (selectedCategory) {
+      params.set('category', selectedCategory);
     }
+    
+    if (searchInput.trim()) {
+      const { title, tags } = parseSearchInput(searchInput);
+      
+      if (title) {
+        params.set('title', title);
+      }
+      if (tags.length > 0) {
+        params.set('tags', tags.join(','));
+      }
+    }
+    
+    setSearchParams(params);
   };
 
   const handleCategoryChange = (category: BoardCategory | undefined) => {
     setSelectedCategory(category);
     const params = new URLSearchParams();
     if (category) params.set('category', category);
-    if (searchKeyword.trim()) params.set('keyword', searchKeyword.trim());
+    
+    if (searchInput.trim()) {
+      const { title, tags } = parseSearchInput(searchInput);
+      if (title) params.set('title', title);
+      if (tags.length > 0) params.set('tags', tags.join(','));
+    }
+    
     setSearchParams(params);
   };
 
   const getCategoryLabel = (category: BoardCategory) => {
     const labels = {
       [BoardCategory.NOTICE]: '공지사항',
+      [BoardCategory.FISH_LOG]: '낚시 일지',
       [BoardCategory.FREE]: '자유게시판',
-      [BoardCategory.QUESTION]: '질문게시판',
-      [BoardCategory.TIP]: '팁게시판',
-      [BoardCategory.REVIEW]: '리뷰게시판'
+      [BoardCategory.INQUIRY]: '문의사항'
     };
     return labels[category];
   };
@@ -146,42 +178,58 @@ const CommunityPage: React.FC = () => {
       {/* Board Section */}
       {viewMode === 'board' && (
         <div>
-          {/* 검색 폼 */}
-          <form onSubmit={handleSearch} className="flex gap-2 mb-6">
-            <div className="flex-1">
-              <input
-                type="text"
-                value={searchKeyword}
-                onChange={(e) => setSearchKeyword(e.target.value)}
-                placeholder="제목, 내용, 태그로 검색..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+          {/* 통합 검색 폼 */}
+          <div className="mb-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
+              <p className="text-sm text-blue-800">
+                💡 <strong>검색 팁:</strong> #태그를 입력하고 스페이스를 누르면 태그로 변환됩니다! 
+                여러 태그를 입력하면 OR 검색 (하나라도 일치하면 검색됨)
+                <br />
+                예: <code className="bg-blue-100 px-1 rounded">#바다낚시</code> + 스페이스 → 태그로 변환
+              </p>
             </div>
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              검색
-            </button>
-            {(searchKeyword || selectedCategory) && (
+            
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <div className="flex-1">
+                <TaggableInput
+                  value={searchInput}
+                  onChange={setSearchInput}
+                  placeholder="제목과 #태그로 검색하세요... (#태그 + 스페이스로 태그 생성)"
+                  onSubmit={() => {
+                    const event = new Event('submit') as any;
+                    handleSearch(event);
+                  }}
+                  className="w-full"
+                />
+              </div>
               <button
-                type="button"
-                onClick={() => {
-                  setSearchKeyword('');
-                  setSelectedCategory(undefined);
-                  setSearchParams({});
-                }}
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                type="submit"
+                className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                초기화
+                검색
               </button>
-            )}
-          </form>
+              {(searchInput || selectedCategory) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchInput('');
+                    setSelectedCategory(undefined);
+                    setSearchParams({});
+                  }}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+                >
+                  초기화
+                </button>
+              )}
+            </form>
+          </div>
 
           {/* 게시글 목록 */}
           <BoardList 
             category={selectedCategory} 
             searchKeyword={searchParams.get('keyword') || undefined}
+            searchTitle={searchParams.get('title') || undefined}
+            searchTags={searchParams.get('tags') || undefined}
           />
         </div>
       )}

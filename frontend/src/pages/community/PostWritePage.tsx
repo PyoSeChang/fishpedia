@@ -137,10 +137,9 @@ const PostWritePage: React.FC = () => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             required
           >
-            <option value={BoardCategory.FREE}>자유 게시판</option>
-            <option value={BoardCategory.QUESTION}>질문</option>
-            <option value={BoardCategory.TIP}>팁</option>
-            <option value={BoardCategory.REVIEW}>리뷰</option>
+            <option value={BoardCategory.FREE}>자유게시판</option>
+            <option value={BoardCategory.FISH_LOG}>낚시 일지</option>
+            <option value={BoardCategory.INQUIRY}>문의사항</option>
             <option value={BoardCategory.NOTICE}>공지사항</option>
           </select>
         </div>

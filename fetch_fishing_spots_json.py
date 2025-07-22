@@ -44,10 +44,11 @@ class FishingSpotJsonFetcher:
         
         try:
             print(f"API 요청 중: gubun={gubun}")
+            print(f"요청 파라미터: {params}")
             # 타임아웃과 추가 설정 적용
             response = self.session.get(
                 self.api_url, 
-                params=params, 
+                params=params,
                 timeout=30,
                 verify=False,
                 headers={
@@ -58,11 +59,12 @@ class FishingSpotJsonFetcher:
             
             data = response.json()
             print(f"API 응답 성공: gubun '{gubun}' - 상태코드 {response.status_code}")
-            
+        
             return data
             
         except requests.exceptions.RequestException as e:
             print(f"API 요청 실패 (gubun: {gubun}): {e}")
+            print("응답"+response.text)
             return None
         except json.JSONDecodeError as e:
             print(f"JSON 파싱 실패 (gubun: {gubun}): {e}")

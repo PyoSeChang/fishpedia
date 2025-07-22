@@ -14,7 +14,8 @@ class FishingSpotJsonInserter:
             'user': 'root',
             'password': '1234',
             'database': 'fishpedia',
-            'charset': 'utf8mb4'
+            'charset': 'utf8',
+            'auth_plugin': 'mysql_native_password'
         }
     
     def connect_database(self):
@@ -83,9 +84,9 @@ class FishingSpotJsonInserter:
     def process_spot_item(self, item, gubun):
         """개별 스팟 아이템을 처리합니다."""
         # API 응답에서 필요한 데이터 추출 (실제 API 구조에 따라 수정 필요)
-        name = item.get('fcltNm', item.get('name', item.get('spotNm', '')))
+        name = item.get('seafsPstnNm', item.get('fcltNm', item.get('name', item.get('spotNm', ''))))
         latitude = item.get('lat', item.get('latitude', item.get('wido')))
-        longitude = item.get('lon', item.get('longitude', item.get('gyeongdo')))
+        longitude = item.get('lot', item.get('lon', item.get('longitude', item.get('gyeongdo'))))
         
         # 위도/경도를 float로 변환
         try:
@@ -190,16 +191,9 @@ class FishingSpotJsonInserter:
         return inserted_count > 0
 
 def main():
-    if len(sys.argv) != 2:
-        print("사용법: python insert_fishing_spots_from_json.py <json_파일명>")
-        print("\n사용 가능한 JSON 파일들:")
-        json_files = glob.glob("fishing_spots_*.json")
-        for f in json_files:
-            file_size = os.path.getsize(f)
-            print(f"  - {f} ({file_size:,} bytes)")
-        sys.exit(1)
-    
-    filename = sys.argv[1]
+    # 하드코딩된 파일 경로 사용 (스크립트 위치 기준)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filename = os.path.join(os.path.dirname(script_dir), "fishing_spots_all_20250722_100810.json")
     
     if not os.path.exists(filename):
         print(f"파일이 존재하지 않습니다: {filename}")

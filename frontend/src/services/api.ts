@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-// API 기본 설정
-const API_BASE_URL = 'http://10.100.103.43:8081/api';
+// API 기본 설정 - 동적으로 현재 호스트에 맞춰서 설정
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 
+  `${window.location.protocol}//${window.location.hostname}:8081/api`;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

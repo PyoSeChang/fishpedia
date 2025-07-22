@@ -23,4 +23,7 @@ public interface FishLogService {
     
     // 특정 낚시 일지 조회
     FishLog getFishLogById(Long id, User user);
+    
+    // 낚시 일지 검증
+    boolean verifyFishLog(Long fishLogId, User user);
 } 

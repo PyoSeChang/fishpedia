@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -103,6 +104,57 @@ public class BoardServiceImpl implements BoardService {
             boards = boardRepository.findByKeyword(keyword, pageable);
         } else {
             boards = boardRepository.findAll(pageable);
+        }
+        
+        return boards.map(this::convertToResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<BoardResponse> getBoards(BoardCategory category, String keyword, String title, String tags, Pageable pageable) {
+        // 새로운 검색 방식이 사용되지 않으면 기존 방식으로 처리
+        if ((title == null || title.trim().isEmpty()) && (tags == null || tags.trim().isEmpty())) {
+            return getBoards(category, keyword, pageable);
+        }
+        
+        Page<Board> boards;
+        
+        // 태그 파싱 (최대 5개까지 지원)
+        String[] tagArray = null;
+        if (tags != null && !tags.trim().isEmpty()) {
+            tagArray = Arrays.stream(tags.split(","))
+                    .map(String::trim)
+                    .filter(tag -> !tag.isEmpty())
+                    .limit(5)
+                    .toArray(String[]::new);
+        }
+        
+        // 파라미터에 따른 검색 분기
+        if (category != null) {
+            // 카테고리가 있는 경우
+            boards = boardRepository.findByCategoryAndTitleAndTags(
+                    category,
+                    title != null && !title.trim().isEmpty() ? title : null,
+                    tags != null && !tags.trim().isEmpty() ? tags : null,
+                    tagArray != null && tagArray.length > 0 ? tagArray[0] : null,
+                    tagArray != null && tagArray.length > 1 ? tagArray[1] : null,
+                    tagArray != null && tagArray.length > 2 ? tagArray[2] : null,
+                    tagArray != null && tagArray.length > 3 ? tagArray[3] : null,
+                    tagArray != null && tagArray.length > 4 ? tagArray[4] : null,
+                    pageable
+            );
+        } else {
+            // 카테고리가 없는 경우
+            boards = boardRepository.findByTitleAndTags(
+                    title != null && !title.trim().isEmpty() ? title : null,
+                    tags != null && !tags.trim().isEmpty() ? tags : null,
+                    tagArray != null && tagArray.length > 0 ? tagArray[0] : null,
+                    tagArray != null && tagArray.length > 1 ? tagArray[1] : null,
+                    tagArray != null && tagArray.length > 2 ? tagArray[2] : null,
+                    tagArray != null && tagArray.length > 3 ? tagArray[3] : null,
+                    tagArray != null && tagArray.length > 4 ? tagArray[4] : null,
+                    pageable
+            );
         }
         
         return boards.map(this::convertToResponse);

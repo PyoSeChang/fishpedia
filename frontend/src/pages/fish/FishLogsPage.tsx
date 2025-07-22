@@ -19,6 +19,7 @@ const FishLogsPage: React.FC = () => {
   const [collectionLoading, setCollectionLoading] = useState(true);
   const [levelUpdateResult, setLevelUpdateResult] = useState<LevelUpdateResult | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [verifyingLogs, setVerifyingLogs] = useState<Set<number>>(new Set());
 
 
   useEffect(() => {
@@ -108,6 +109,33 @@ const FishLogsPage: React.FC = () => {
       navigate(`/fish/logs?fishId=${fishId}`, { replace: true });
     } else {
       navigate('/fish/logs', { replace: true });
+    }
+  };
+
+  const handleVerifyFishLog = async (fishLogId: number) => {
+    try {
+      setVerifyingLogs(prev => new Set([...prev, fishLogId]));
+      
+      const isVerified = await fishService.verifyFishLog(fishLogId);
+      
+      if (isVerified) {
+        // 일지 목록 새로고침
+        const fishIdParam = selectedFish === '' ? undefined : selectedFish as number;
+        const result = await fishService.getFishLogs(fishIdParam);
+        setFishLogs(result.fishLogs);
+        alert('랭킹 등록이 완료되었습니다!');
+      } else {
+        alert('검증에 실패했습니다. 다시 시도해주세요.');
+      }
+    } catch (error) {
+      console.error('검증 실패:', error);
+      alert('검증 중 오류가 발생했습니다.');
+    } finally {
+      setVerifyingLogs(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(fishLogId);
+        return newSet;
+      });
     }
   };
 
@@ -311,6 +339,33 @@ const FishLogsPage: React.FC = () => {
                       <p className="text-gray-700 text-sm line-clamp-3">{log.review}</p>
                     </div>
                   )}
+                  
+                  {/* 랭킹 등록 버튼 */}
+                  <div className="mt-4 flex justify-between items-center">
+                    {log.certified ? (
+                      <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+                        ✓ 랭킹 등록됨
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => handleVerifyFishLog(log.id)}
+                        disabled={verifyingLogs.has(log.id)}
+                        className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1"
+                      >
+                        {verifyingLogs.has(log.id) ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>검증 중...</span>
+                          </>
+                        ) : (
+                          <>
+                            <span>🏆</span>
+                            <span>랭킹 등록</span>
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

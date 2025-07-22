@@ -49,6 +49,7 @@ export interface FishingSpot {
   managementOffice?: string;
   dataReferenceDate?: string;
   region?: string;
+  fishingLevelInfo?: boolean; // 바다 낚시 지수 정보 제공 여부
 }
 
 export interface SpotSearchRequest {

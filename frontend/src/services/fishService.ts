@@ -25,6 +25,7 @@ export interface FishLog {
   place?: string;
   review?: string;
   imgPath?: string;
+  certified?: boolean;
 }
 
 export interface FishLogDTO {
@@ -213,6 +214,12 @@ export const fishService = {
   async getFishLogs(fishId?: number): Promise<FishLogDTO> {
     const params = fishId ? `?fishId=${fishId}` : '';
     const response = await api.get(`/fish/logs${params}`);
+    return response.data;
+  },
+
+  // 낚시 일지 검증 (랭킹 등록)
+  async verifyFishLog(fishLogId: number): Promise<boolean> {
+    const response = await api.post(`/fish/logs/${fishLogId}/verify`);
     return response.data;
   }
 }; 

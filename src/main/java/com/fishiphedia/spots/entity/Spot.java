@@ -8,7 +8,14 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "spots")
+@Table(name = "spots", indexes = {
+    @Index(name = "idx_spot_region", columnList = "region"),
+    @Index(name = "idx_spot_type", columnList = "spot_type"),
+    @Index(name = "idx_spot_location", columnList = "latitude, longitude"),
+    @Index(name = "idx_spot_name", columnList = "name"),
+    @Index(name = "idx_spot_fish_species", columnList = "main_fish_species"),
+    @Index(name = "idx_spot_gubun", columnList = "gubun")
+})
 @Getter
 @Setter
 @NoArgsConstructor

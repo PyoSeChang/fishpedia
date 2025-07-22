@@ -177,9 +177,8 @@ const BoardForm: React.FC<BoardFormProps> = ({ isEdit = false }) => {
 
   const getCategoryOptions = () => [
     { value: BoardCategory.FREE, label: '자유게시판' },
-    { value: BoardCategory.QUESTION, label: '질문게시판' },
-    { value: BoardCategory.TIP, label: '팁게시판' },
-    { value: BoardCategory.REVIEW, label: '리뷰게시판' },
+    { value: BoardCategory.FISH_LOG, label: '낚시 일지' },
+    { value: BoardCategory.INQUIRY, label: '문의사항' },
     { value: BoardCategory.NOTICE, label: '공지사항' }
   ];
 
