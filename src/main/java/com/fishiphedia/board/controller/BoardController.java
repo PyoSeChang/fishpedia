@@ -5,6 +5,8 @@ import com.fishiphedia.board.entity.BoardCategory;
 import com.fishiphedia.board.service.BoardService;
 import com.fishiphedia.common.service.FileUploadService;
 import com.fishiphedia.common.util.JwtUtil;
+import com.fishiphedia.search.service.SearchLogService;
+import com.fishiphedia.search.entity.SearchLog.SearchType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -27,6 +30,7 @@ public class BoardController {
     private final BoardService boardService;
     private final JwtUtil jwtUtil;
     private final FileUploadService fileUploadService;
+    private final SearchLogService searchLogService;
 
     @PostMapping
     public ResponseEntity<BoardResponse> createBoard(
@@ -68,8 +72,28 @@ public class BoardController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String tags,
-            @PageableDefault(size = 20, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestHeader(value = "Authorization", required = false) String token,
+            HttpServletRequest request) {
+        
         Page<BoardResponse> response = boardService.getBoards(category, keyword, title, tags, pageable);
+        
+        // 검색 키워드가 있는 경우 검색 로그 저장
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            Long userId = null;
+            try {
+                if (token != null && token.startsWith("Bearer ")) {
+                    String loginId = jwtUtil.getLoginIdFromToken(token.substring(7));
+                    // 로그인ID로 사용자ID를 찾는 로직이 필요하다면 추가
+                }
+            } catch (Exception e) {
+                log.debug("토큰에서 사용자 정보 추출 실패: {}", e.getMessage());
+            }
+            
+            searchLogService.logSearch(keyword.trim(), SearchType.COMMUNITY, 
+                                     (int) response.getTotalElements(), userId, request);
+        }
+        
         return ResponseEntity.ok(response);
     }
 

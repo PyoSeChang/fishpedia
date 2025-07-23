@@ -112,8 +112,8 @@ public class FishController {
                 log.info("FastAPI를 통해 계산된 점수: {}", score);
                 return ResponseEntity.ok(Map.of("score", score, "source", "fastapi"));
             } else {
-                // FastAPI 실패시 기본 점수 계산 로직
-                int defaultScore = calculateDefaultScore(fishType, length);
+                // FastAPI 실패시 기본 점수 계산 로직 (간단한 기본값)
+                int defaultScore = 50;
                 log.info("기본 로직으로 계산된 점수: {}", defaultScore);
                 return ResponseEntity.ok(Map.of("score", defaultScore, "source", "default"));
             }
@@ -122,31 +122,6 @@ public class FishController {
             log.error("점수 계산 중 오류 발생", e);
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
-    }
-    
-    // 기본 점수 계산 로직
-    private int calculateDefaultScore(String fishType, Double length) {
-        int baseScore = 50;
-        
-        // 어종별 기본 점수
-        if (fishType != null) {
-            switch (fishType.toLowerCase()) {
-                case "붕어": baseScore = 60; break;
-                case "잉어": baseScore = 70; break;
-                case "배스": baseScore = 80; break;
-                case "송어": baseScore = 90; break;
-                default: baseScore = 50;
-            }
-        }
-        
-        // 크기별 추가 점수
-        if (length != null) {
-            if (length >= 30) baseScore += 30;
-            else if (length >= 20) baseScore += 20;
-            else if (length >= 10) baseScore += 10;
-        }
-        
-        return Math.min(baseScore, 100); // 최대 100점
     }
 
     // 물고기 식별 API (FastAPI 연동)

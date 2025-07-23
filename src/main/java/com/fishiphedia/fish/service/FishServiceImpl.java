@@ -106,6 +106,11 @@ public class FishServiceImpl implements FishService {
         }
     }
 
+    @Override
+    public Fish findByName(String name) {
+        return fishRepository.findByName(name).orElse(null);
+    }
+
     private FishResponse convertToResponse(Fish fish) {
         FishResponse response = new FishResponse();
         response.setId(fish.getId());

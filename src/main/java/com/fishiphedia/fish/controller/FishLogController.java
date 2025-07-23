@@ -11,12 +11,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.fishiphedia.common.service.FileUploadService;
 import com.fishiphedia.fish.entity.FishLog;
 import com.fishiphedia.fish.service.FishLogService;
 import com.fishiphedia.user.entity.User;
 import com.fishiphedia.user.service.UserService;
+import com.fishiphedia.search.service.SearchLogService;
+import com.fishiphedia.search.entity.SearchLog.SearchType;
+import com.fishiphedia.fish.service.FishService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,8 @@ public class FishLogController {
     private final UserService userService;
     private final FileUploadService fileUploadService;
     private final FishCollectionService fishCollectionService;
+    private final SearchLogService searchLogService;
+    private final FishService fishService;
 
 
     // 낚시 일지 작성 (레벨 업데이트 포함)
@@ -92,7 +98,8 @@ public class FishLogController {
     // 사용자의 낚시 일지 목록 조회
     @GetMapping
     public FishLogDTO getMyFishLogs(
-            @RequestParam(value = "fishId", required = false) Long fishId) {
+            @RequestParam(value = "fishId", required = false) Long fishId,
+            HttpServletRequest request) {
         
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.findByLoginId(authentication.getName());
@@ -103,6 +110,23 @@ public class FishLogController {
         if (fishId != null) {
             fishLogs = fishLogService.getUserFishLogsByFish(user, fishId);
             fishCollection= fishCollectionService.getFishCollectionByFish(fishId);
+            
+            // 특정 물고기로 필터링한 경우 검색 로그 저장
+            try {
+                String fishName = "물고기ID:" + fishId;
+                try {
+                    var fishResponse = fishService.getFishById(fishId);
+                    if (fishResponse != null) {
+                        fishName = fishResponse.getName();
+                    }
+                } catch (Exception ignored) {
+                    // 물고기 이름 조회 실패 시 ID로 대체
+                }
+                searchLogService.logSearch(fishName, SearchType.FISH_LOG, 
+                                         fishLogs.size(), user.getId(), request);
+            } catch (Exception e) {
+                log.debug("낚시 일지 검색 로그 저장 실패: {}", e.getMessage());
+            }
         } else {
             fishLogs = fishLogService.getUserFishLogs(user);
             fishCollection = null;

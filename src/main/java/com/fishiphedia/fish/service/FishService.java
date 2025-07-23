@@ -2,6 +2,7 @@ package com.fishiphedia.fish.service;
 
 import com.fishiphedia.fish.dto.FishRequest;
 import com.fishiphedia.fish.dto.FishResponse;
+import com.fishiphedia.fish.entity.Fish;
 
 import java.util.List;
 
@@ -24,4 +25,7 @@ public interface FishService {
 
     // 컬렉션으로 복사
     void copyFishToCollection(Long userId);
+    
+    // 이름으로 물고기 조회
+    Fish findByName(String name);
 } 
