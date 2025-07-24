@@ -1,36 +1,44 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 from pathlib import Path
 from config.settings import MODEL_PATH, MODEL_CLASSES
 import logging
 
 logger = logging.getLogger(__name__)
 
-class FishCNN(nn.Module):
+class BinaryCNN(nn.Module):
     def __init__(self, num_classes=10):
-        super(FishCNN, self).__init__()
-        # 에러 메시지를 통해 파악한 실제 모델 구조
-        # fc1.weight: torch.Size([128, 65536]) = 256 channels * 16*16 = 65536
-        self.conv1 = nn.Conv2d(3, 128, 3, padding=1)  # 첫 번째 conv
-        self.conv2 = nn.Conv2d(128, 256, 3, padding=1)  # 두 번째 conv (256 channels)
-        self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(256 * 16 * 16, 128)  # 65536 = 256 * 16 * 16
-        self.fc2 = nn.Linear(128, num_classes)
-        self.relu = nn.ReLU()
+        super(BinaryCNN, self).__init__()
+
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)  # [B, 32, 224, 224]
+        self.pool1 = nn.MaxPool2d(2, 2)  # [B, 32, 112, 112]
+
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)  # [B, 64, 112, 112]
+        self.pool2 = nn.MaxPool2d(2, 2)  # [B, 64, 56, 56]
+
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)  # [B, 128, 56, 56]
+        self.pool3 = nn.MaxPool2d(2, 2)  # [B, 128, 28, 28]
+
         self.dropout = nn.Dropout(0.5)
-    
+        self.fc1 = nn.Linear(128 * 28 * 28, 512)
+        self.fc2 = nn.Linear(512, num_classes)
+
     def forward(self, x):
-        # 224 -> 112 -> 56 -> 28 -> 14 크기로 줄어들어야 16에 가까워짐
-        x = self.pool(self.relu(self.conv1(x)))  # 224 -> 112
-        x = self.pool(self.relu(self.conv2(x)))  # 112 -> 56
-        # 추가 pooling이 필요할 수 있음
-        x = self.pool(x)  # 56 -> 28  
-        x = self.pool(x)  # 28 -> 14
-        
-        x = x.view(-1, 256 * 14 * 14)  # 실제로는 다른 크기일 수 있음
-        x = self.relu(self.fc1(x))
+        x = F.relu(self.conv1(x))
+        x = self.pool1(x)
+
+        x = F.relu(self.conv2(x))
+        x = self.pool2(x)
+
+        x = F.relu(self.conv3(x))
+        x = self.pool3(x)
+
+        x = x.view(x.size(0), -1)  # Flatten
         x = self.dropout(x)
-        x = self.fc2(x)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)  # 최종 출력 (로짓)
+
         return x
 
 class ModelManager:
@@ -50,19 +58,25 @@ class ModelManager:
 
     def _load_model(self):
         try:
-            # 일단 기본적인 구조로 시작
-            self._model = nn.Module()
-            
             if MODEL_PATH.exists():
-                # 모델 파일을 직접 로드해서 구조 파악
+                # BinaryCNN 모델 구조로 직접 로드
+                self._model = BinaryCNN(num_classes=len(MODEL_CLASSES))
+                
+                # 모델 파일 로드
                 state_dict = torch.load(MODEL_PATH, map_location=self._device)
                 
-                # 실제 모델 구조 분석해서 동적으로 생성
-                self._model = self._create_model_from_state_dict(state_dict)
-                self._model.load_state_dict(state_dict, strict=True)
+                try:
+                    # 직접 로드 시도
+                    self._model.load_state_dict(state_dict, strict=True)
+                except RuntimeError as e:
+                    logger.warning(f"직접 로드 실패, 동적 분석 시도: {e}")
+                    # 실제 모델 구조 분석해서 동적으로 생성
+                    self._model = self._create_model_from_state_dict(state_dict)
+                    self._model.load_state_dict(state_dict, strict=True)
+                
                 self._model.to(self._device)
                 self._model.eval()
-                logger.info(f"모델이 성공적으로 로드되었습니다. 디바이스: {self._device}")
+                logger.info(f"BinaryCNN 모델이 성공적으로 로드되었습니다. 디바이스: {self._device}")
             else:
                 raise FileNotFoundError(f"모델 파일을 찾을 수 없습니다: {MODEL_PATH}")
                 

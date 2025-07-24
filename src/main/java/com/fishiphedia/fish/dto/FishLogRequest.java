@@ -13,4 +13,5 @@ public class FishLogRequest {
     private String place;
     private String review;
     private String imgPath;
+    private Long classificationLogId; // 추가: 분류 로그 ID
 } 

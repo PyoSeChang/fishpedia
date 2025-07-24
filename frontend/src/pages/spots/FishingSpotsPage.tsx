@@ -51,7 +51,7 @@ const FishingLevelTable: React.FC<{ spot: FishingSpot }> = ({ spot }) => {
     return (
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
-          <span>🌊</span>
+          <span></span>
           <h3 className="text-lg font-semibold text-blue-800">바다 낚시 지수</h3>
         </div>
         <div className="flex items-center justify-center py-8">
@@ -65,7 +65,7 @@ const FishingLevelTable: React.FC<{ spot: FishingSpot }> = ({ spot }) => {
     return (
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
-          <span>🌊</span>
+          <span></span>
           <h3 className="text-lg font-semibold text-blue-800">바다 낚시 지수</h3>
         </div>
         <div className="text-gray-500 text-center py-4">정보를 불러올 수 없습니다.</div>
@@ -76,7 +76,7 @@ const FishingLevelTable: React.FC<{ spot: FishingSpot }> = ({ spot }) => {
   return (
     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
       <div className="flex items-center gap-2 mb-4">
-        <span>🌊</span>
+        <span></span>
         <h3 className="text-lg font-semibold text-blue-800">바다 낚시 지수</h3>
       </div>
       
@@ -129,7 +129,7 @@ const FishingLevelTable: React.FC<{ spot: FishingSpot }> = ({ spot }) => {
       {/* 추천 메시지 */}
       <div className="bg-white rounded-lg border border-blue-200 p-3">
         <div className="text-sm text-gray-700">
-          <span className="font-medium text-blue-700">🎯 추천:</span>
+          <span className="font-medium text-blue-700"> 추천:</span>
           <p className="mt-1">{fishingLevel.recommendation}</p>
         </div>
       </div>
@@ -342,10 +342,10 @@ const FishingSpotsPage: React.FC = () => {
   // 스팟 타입별 아이콘
   const getSpotTypeIcon = (spotType?: SpotType) => {
     switch (spotType) {
-      case SpotType.SEA: return '🌊';
-      case SpotType.RESERVOIR: return '🏞️';
-      case SpotType.FLATLAND: return '🎣';
-      default: return '📍';
+      case SpotType.SEA: return '';
+      case SpotType.RESERVOIR: return '';
+      case SpotType.FLATLAND: return '';
+      default: return '';
     }
   };
 
@@ -493,7 +493,7 @@ const FishingSpotsPage: React.FC = () => {
     <div className="max-w-7xl mx-auto p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-blue-600 mb-4">🎣 낚시 스팟</h1>
+        <h1 className="text-3xl font-bold text-blue-600 mb-4">낚시 스팟</h1>
         <p className="text-gray-600 mb-6">
           전국의 인기 낚시 스팟을 지도에서 확인하고 정보를 얻어보세요
         </p>
@@ -501,7 +501,7 @@ const FishingSpotsPage: React.FC = () => {
         {/* 지역 선택 */}
         <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
           <div className="flex items-center gap-3 mb-3">
-            <span className="text-lg">🗺️</span>
+            <span className="text-lg"></span>
             <h3 className="text-lg font-semibold text-blue-800">지역 선택</h3>
             <span className="text-sm text-blue-600">성능 최적화를 위해 지역을 먼저 선택해주세요</span>
           </div>
@@ -549,14 +549,14 @@ const FishingSpotsPage: React.FC = () => {
                 className="w-full px-4 py-3 pl-12 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
               />
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <span className="text-gray-400 text-xl">🔍</span>
+                <span className="text-gray-400 text-xl"></span>
               </div>
               {searchKeyword && (
                 <button
                   onClick={() => setSearchKeyword('')}
                   className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600"
                 >
-                  <span className="text-xl">✕</span>
+                  <span className="text-xl"></span>
                 </button>
               )}
             </div>
@@ -567,7 +567,7 @@ const FishingSpotsPage: React.FC = () => {
                 onClick={() => setShowDetailSearch(!showDetailSearch)}
                 className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 whitespace-nowrap"
               >
-                <span>🔧</span>
+                <span></span>
                 세부 검색
                 <span className={`transition-transform ${showDetailSearch ? 'rotate-180' : ''}`}>
                   ▼
@@ -582,7 +582,7 @@ const FishingSpotsPage: React.FC = () => {
                   {/* 낚시터 유형 */}
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <span>🏞️</span> 낚시터 유형
+                      <span></span> 낚시터 유형
                     </h4>
                     <div className="flex flex-wrap gap-3">
                       {Object.entries(SPOT_TYPE_LABELS).map(([type, label]) => (
@@ -614,7 +614,7 @@ const FishingSpotsPage: React.FC = () => {
                   {/* 수상시설 유형 */}
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <span>⛵</span> 수상시설 유형
+                      <span></span> 수상시설 유형
                     </h4>
                     <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
                       {Object.entries(WATER_FACILITY_TYPE_LABELS).map(([type, label]) => (
@@ -646,7 +646,7 @@ const FishingSpotsPage: React.FC = () => {
                   {/* 어종 */}
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <span>🐟</span> 주요 어종
+                      <span></span> 주요 어종
                     </h4>
                     <div className="grid grid-cols-3 gap-2">
                       {['농어', '광어', '도미', '참돔', '우럭', '감성돔', '방어', '고등어', '전어'].map(fish => (
@@ -678,7 +678,7 @@ const FishingSpotsPage: React.FC = () => {
                   {/* 이용료 범위 */}
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <span>💰</span> 이용료 범위
+                      <span></span> 이용료 범위
                     </h4>
                     <div className="flex items-center gap-3">
                       <input
@@ -709,7 +709,7 @@ const FishingSpotsPage: React.FC = () => {
                   {/* 편의시설 */}
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                      <span>🏪</span> 편의시설
+                      <span></span> 편의시설
                     </h4>
                     <div className="grid grid-cols-3 gap-2">
                       {['화장실', '주차장', '매점', '식당', '낚시대여', '미끼판매', '숙박시설', '샤워장', '휴게소'].map(facility => (
@@ -795,7 +795,7 @@ const FishingSpotsPage: React.FC = () => {
                 {!window.naver && (
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
-                      <div className="text-4xl mb-4">🗺️</div>
+                      <div className="text-4xl mb-4"></div>
                       <p className="text-gray-600">지도를 로딩하는 중...</p>
                       <p className="text-sm text-gray-500 mt-2">
                         네이버 지도 API 키가 필요합니다
@@ -808,7 +808,7 @@ const FishingSpotsPage: React.FC = () => {
               {/* 마커 범례 */}
               <div className="absolute top-4 right-4 bg-white bg-opacity-95 backdrop-blur-sm rounded-lg shadow-lg border border-gray-200 p-3 z-[1000]">
                 <h4 className="text-sm font-semibold text-gray-800 mb-2 flex items-center gap-1">
-                  <span>📍</span>
+                  <span></span>
                   마커 범례
                 </h4>
                 <div className="space-y-1.5 text-xs">
@@ -817,7 +817,7 @@ const FishingSpotsPage: React.FC = () => {
                       className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
                       style={{ backgroundColor: '#3B82F6' }}
                     >
-                      🌊
+                      
                     </div>
                     <span className="text-gray-700">바다</span>
                   </div>
@@ -826,7 +826,7 @@ const FishingSpotsPage: React.FC = () => {
                       className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
                       style={{ backgroundColor: '#10B981' }}
                     >
-                      🏞️
+                      
                     </div>
                     <span className="text-gray-700">저수지</span>
                   </div>
@@ -835,7 +835,7 @@ const FishingSpotsPage: React.FC = () => {
                       className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
                       style={{ backgroundColor: '#F59E0B' }}
                     >
-                      🎣
+                      
                     </div>
                     <span className="text-gray-700">평지</span>
                   </div>
@@ -844,7 +844,7 @@ const FishingSpotsPage: React.FC = () => {
                       className="flex items-center justify-center w-6 h-6 rounded text-white text-xs font-bold shadow-sm"
                       style={{ backgroundColor: '#6B7280' }}
                     >
-                      📍
+                      
                     </div>
                     <span className="text-gray-700">기타</span>
                   </div>
@@ -862,12 +862,12 @@ const FishingSpotsPage: React.FC = () => {
           <div className="space-y-4 max-h-[500px] overflow-y-auto">
             {loading ? (
               <div className="text-center py-8">
-                <div className="text-4xl mb-4">⏳</div>
+                <div className="text-4xl mb-4"></div>
                 <p className="text-gray-500">낚시터 정보를 불러오는 중...</p>
               </div>
             ) : filteredSpots.length === 0 ? (
               <div className="text-center py-8">
-                <div className="text-4xl mb-4">🎣</div>
+                <div className="text-4xl mb-4"></div>
                 <p className="text-gray-500 mb-2">{spots.length === 0 ? '해당 지역에 낚시터 정보가 없습니다' : '검색 결과가 없습니다'}</p>
                 <p className="text-sm text-gray-400">
                   {spots.length === 0 ? '다른 지역을 선택해보세요' : '다른 키워드로 검색해보거나 필터를 변경해보세요'}
@@ -943,7 +943,7 @@ const FishingSpotsPage: React.FC = () => {
               onClick={() => setSelectedSpot(null)}
               className="text-gray-400 hover:text-gray-600"
             >
-              ✕
+              
             </button>
           </div>
           
@@ -1009,7 +1009,7 @@ const FishingSpotsPage: React.FC = () => {
                 {selectedSpot.usageFee && (
                   <div>
                     <span className="font-medium text-gray-700">이용요금:</span>
-                    <span className="ml-2 text-gray-600">💰 {selectedSpot.usageFee}</span>
+                    <span className="ml-2 text-gray-600"> {selectedSpot.usageFee}</span>
                   </div>
                 )}
                 

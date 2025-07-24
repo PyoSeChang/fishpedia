@@ -4,15 +4,29 @@ services:
     image: mysql:8.0
     container_name: fishiphedia-db
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: fishiphedia
-      MYSQL_USER: fishuser
-      MYSQL_PASSWORD: fishpassword
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1234
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database_migration.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - fishiphedia-network
+    restart: unless-stopped
+
+  # FastAPI AI 서비스
+  fastapi:
+    build:
+      context: ./fastApi
+      dockerfile: Dockerfile
+    container_name: fishiphedia-fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./best_model2.h5:/app/best_model2.h5
     networks:
       - fishiphedia-network
     restart: unless-stopped

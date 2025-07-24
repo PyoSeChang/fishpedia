@@ -79,6 +79,9 @@ async def predict_fish(file: UploadFile = File(...)):
         raise HTTPException(status_code=400, detail="이미지 파일만 업로드 가능합니다")
     
     try:
+        from PIL import Image
+        import io
+        
         # 파일 내용 읽기
         contents = await file.read()
         
@@ -88,37 +91,94 @@ async def predict_fish(file: UploadFile = File(...)):
         
         # 이미지 유효성 검사 및 전처리
         image_processor.validate_image(contents, file.filename)
-        image_array = image_processor.preprocess_image(contents)
         
-        # TensorFlow 모델용 전처리
-        processed_image = tf_model_manager.preprocess_image(image_array)
+        # 훈련 코드와 동일한 Keras 방식으로 이미지 전처리
+        from tensorflow.keras.preprocessing import image
+        import tempfile
+        import os
+        
+        # 임시 파일로 저장 (Keras load_img를 사용하기 위해)
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_file:
+            temp_file.write(contents)
+            temp_path = temp_file.name
+        
+        try:
+            # 훈련할 때와 동일한 방식으로 전처리
+            img = image.load_img(temp_path, target_size=(128, 128))
+            img_array = image.img_to_array(img) / 255.0  # 정규화
+            img_array = np.expand_dims(img_array, axis=0)  # (1, 128, 128, 3)
+        finally:
+            # 임시 파일 삭제
+            os.unlink(temp_path)
         
         # 모델 예측
-        predictions = tf_model_manager.predict(processed_image)
-        probabilities = predictions[0]  # 첫 번째 배치
+        logger.info(f"이미지 배열 형태: {img_array.shape}")
+        logger.info(f"이미지 배열 타입: {type(img_array)}")
+        logger.info(f"이미지 배열 범위: min={img_array.min():.3f}, max={img_array.max():.3f}")
         
-        predicted_idx = np.argmax(probabilities)
+        predictions = tf_model_manager.predict(img_array)
+        logger.info(f"모델 예측 결과 형태: {predictions.shape}")
+        logger.info(f"원시 예측값: {predictions}")
+        
+        probabilities = predictions[0]  # (10,)
+        logger.info(f"확률 배열: {probabilities}")
+        logger.info(f"확률 합계: {np.sum(probabilities):.6f}")
+        
+        predicted_idx = int(np.argmax(probabilities))
         confidence = float(probabilities[predicted_idx])
-        
         predicted_fish = MODEL_CLASSES[predicted_idx]
+        
+        logger.info(f"예측된 인덱스: {predicted_idx}")
+        logger.info(f"예측된 물고기: {predicted_fish}")
+        logger.info(f"신뢰도: {confidence:.6f}")
         
         # 모든 예측 결과 정리
         all_predictions = []
         for i, prob in enumerate(probabilities):
-            all_predictions.append({
+            fish_result = {
                 "fish_name": MODEL_CLASSES[i],
                 "confidence": float(prob)
-            })
+            }
+            all_predictions.append(fish_result)
+            logger.info(f"  {i}: {MODEL_CLASSES[i]} -> {float(prob):.6f}")
         
         all_predictions.sort(key=lambda x: x["confidence"], reverse=True)
         
-        logger.info(f"분류 완료: {predicted_fish} (신뢰도: {confidence:.3f})")
+        logger.info(f"최종 분류 완료: {predicted_fish} (신뢰도: {confidence:.6f})")
+        logger.info(f"상위 3개 예측:")
+        for i, pred in enumerate(all_predictions[:3]):
+            logger.info(f"  {i+1}. {pred['fish_name']}: {pred['confidence']:.6f}")
         
-        return {
+        # 신뢰도 기반 어종 판정 로직
+        is_fish_detected = False
+        detected_fish_name = None
+        
+        # 넙치, 도다리는 0.90 이상
+        if predicted_fish in ['넙치', '도다리'] and confidence >= 0.90:
+            is_fish_detected = True
+            detected_fish_name = predicted_fish
+            logger.info(f"넙치/도다리 인식 성공: {predicted_fish} (신뢰도: {confidence:.6f})")
+        
+        # 나머지 8종은 0.99 이상
+        elif predicted_fish not in ['넙치', '도다리'] and confidence >= 0.99:
+            is_fish_detected = True
+            detected_fish_name = predicted_fish
+            logger.info(f"일반 어종 인식 성공: {predicted_fish} (신뢰도: {confidence:.6f})")
+        
+        else:
+            logger.info(f"신뢰도 부족 - 어종: {predicted_fish}, 신뢰도: {confidence:.6f}")
+        
+        response_data = {
             "predicted_fish": predicted_fish,
             "confidence": confidence,
-            "all_predictions": all_predictions[:5]
+            "all_predictions": all_predictions[:5],
+            "is_fish_detected": is_fish_detected,
+            "detected_fish_name": detected_fish_name
         }
+        
+        logger.info(f"응답 데이터: {response_data}")
+        
+        return response_data
         
     except HTTPException:
         raise

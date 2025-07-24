@@ -1,13 +1,14 @@
+# FastAPI 및 서버
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
-pydantic==2.10.5
-python-dotenv==1.0.1
-sqlalchemy==2.0.36
-pymysql==1.1.1
-cryptography==44.0.0
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
 python-multipart==0.0.20
-Pillow==11.1.0
+
+# TensorFlow 및 머신러닝
 tensorflow==2.19.0
-numpy==1.24.3
+
+# 이미지 처리
+Pillow==10.0.1
+numpy==1.26.0
+
+# 로깅 및 환경 설정
+python-dotenv==1.0.1

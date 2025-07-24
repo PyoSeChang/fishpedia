@@ -191,7 +191,7 @@ const PostWritePage: React.FC = () => {
         {/* 앨범 섹션 */}
         <div className="bg-gray-50 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">📸 앨범</h3>
+            <h3 className="text-lg font-semibold text-gray-800"> 앨범</h3>
             <button
               type="button"
               onClick={handleAddImageToAlbum}
@@ -204,7 +204,7 @@ const PostWritePage: React.FC = () => {
           
           {albumImages.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <div className="text-4xl mb-2">📷</div>
+              <div className="text-4xl mb-2"></div>
               <p>아직 추가된 이미지가 없습니다.</p>
               <p className="text-sm">이미지를 추가하여 게시글과 함께 앨범에 저장하세요!</p>
             </div>

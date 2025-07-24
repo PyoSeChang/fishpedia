@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
           {/* 로고 및 설명 */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">🎣</span>
+              <span className="text-2xl"></span>
               <span className="font-bold text-xl">Fishipedia</span>
             </div>
             <p className="text-blue-100">
@@ -31,9 +31,9 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">연락처</h3>
             <div className="space-y-2 text-blue-100">
-              <p>📧 support@fishipedia.com</p>
-              <p>📱 010-1234-5678</p>
-              <p>📍 서울특별시 강남구</p>
+              <p> support@fishipedia.com</p>
+              <p> 010-1234-5678</p>
+              <p> 서울특별시 강남구</p>
             </div>
           </div>
         </div>

@@ -116,7 +116,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
           레벨 {displayLevel}
           {levelUpdate && showAnimation && levelUpdate.isLevelUp && isAnimating && (
             <span className="ml-2 text-xs text-green-600 font-bold animate-bounce">
-              레벨업! 🎉
+              레벨업! 
             </span>
           )}
         </span>
@@ -162,7 +162,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       {levelUpdate && showAnimation && levelUpdate.isLevelUp && animationStage === 'complete' && (
         <div className="mt-2 text-center">
           <span className="text-sm text-green-600 font-bold animate-bounce">
-            🎊 축하합니다! 레벨 {levelUpdate.newLevel}에 도달했습니다! 🎊
+             축하합니다! 레벨 {levelUpdate.newLevel}에 도달했습니다! 
           </span>
         </div>
       )}

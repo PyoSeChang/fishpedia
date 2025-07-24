@@ -86,7 +86,7 @@ const FishSelector: React.FC<FishSelectorProps> = ({
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.style.display = 'none';
-                  target.parentElement!.innerHTML = '🐟';
+                  target.parentElement!.innerHTML = '';
                 }}
               />
             </div>
@@ -156,7 +156,7 @@ const FishSelector: React.FC<FishSelectorProps> = ({
                 className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100"
               >
                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                  <span className="text-blue-600 text-lg">🌊</span>
+                  <span className="text-blue-600 text-lg"></span>
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
@@ -192,7 +192,7 @@ const FishSelector: React.FC<FishSelectorProps> = ({
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
                           target.style.display = 'none';
-                          target.parentElement!.innerHTML = '🐟';
+                          target.parentElement!.innerHTML = '';
                         }}
                       />
                     </div>

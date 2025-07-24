@@ -49,7 +49,7 @@ const FishCollectionPage: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center">🐟 물고기 도감</h1>
+      <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center"> 물고기 도감</h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {FISH_TYPES.map((fish) => {
           const card = getFishCardInfo(fish);
@@ -73,7 +73,7 @@ const FishCollectionPage: React.FC = () => {
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.style.display = 'none';
-                    target.parentElement!.innerHTML = '🐟';
+                    target.parentElement!.innerHTML = '';
                   }}
                 />
               </div>

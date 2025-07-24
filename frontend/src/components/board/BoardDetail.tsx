@@ -95,7 +95,7 @@ const BoardDetail: React.FC = () => {
               {getCategoryLabel(board.category)}
             </span>
             {board.pinned && (
-              <span className="text-red-500 text-lg">📌</span>
+              <span className="text-red-500 text-lg"></span>
             )}
           </div>
           

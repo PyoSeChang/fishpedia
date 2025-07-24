@@ -187,7 +187,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
       {/* 업로드 섹션 */}
       {showUpload && (
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">📸 이미지 추가</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-3"> 이미지 추가</h4>
           
           <div className="space-y-3">
             {/* 이미지 선택 */}
@@ -235,7 +235,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
       {/* 갤러리 */}
       <div>
         <h4 className="text-sm font-medium text-gray-700 mb-3">
-          📷 앨범 ({allImages.length}장)
+           앨범 ({allImages.length}장)
         </h4>
         
         {allImages.length === 0 ? (
@@ -262,14 +262,14 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
                   {/* 외부 이미지 표시 */}
                   {image.type === 'external' && (
                     <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
-                      📝
+                      
                     </div>
                   )}
                   
                   {onImageSelect && (
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-opacity rounded flex items-center justify-center">
                       <div className="text-white text-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="text-lg">📤</div>
+                        <div className="text-lg"></div>
                         <p className="text-xs">선택</p>
                       </div>
                     </div>
@@ -281,7 +281,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
             {/* 외부 이미지 설명 편집 섹션 */}
             {externalImages.length > 0 && (
               <div className="border-t pt-4">
-                <h5 className="text-sm font-medium text-gray-700 mb-2">📝 에디터 이미지 설명</h5>
+                <h5 className="text-sm font-medium text-gray-700 mb-2"> 에디터 이미지 설명</h5>
                 <div className="space-y-2">
                   {externalImages.map((extImg) => {
                     const imageId = extImg.id;
@@ -352,7 +352,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
               onClick={() => setShowModal(false)}
               className="absolute top-4 right-4 text-white text-xl z-10"
             >
-              ✕
+              
             </button>
 
             {selectedIndex > 0 && (
@@ -386,7 +386,7 @@ const BoardAlbum: React.FC<BoardAlbumProps> = ({
               <p className="text-xs text-gray-300 mt-1">
                 {formatDate(allImages[selectedIndex].createAt)}
                 {allImages[selectedIndex].type === 'external' && (
-                  <span className="ml-2 text-blue-300">📝 에디터 이미지</span>
+                  <span className="ml-2 text-blue-300"> 에디터 이미지</span>
                 )}
               </p>
             </div>

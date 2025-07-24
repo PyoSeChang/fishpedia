@@ -114,7 +114,7 @@ const FishLogsPage: React.FC = () => {
 
   const handleVerifyFishLog = async (fishLogId: number) => {
     try {
-      setVerifyingLogs(prev => new Set([...prev, fishLogId]));
+      setVerifyingLogs(prev => new Set([...Array.from(prev), fishLogId]));
       
       const isVerified = await fishService.verifyFishLog(fishLogId);
       
@@ -158,14 +158,13 @@ const FishLogsPage: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-blue-600 mb-2">📝 낚시 일지</h1>
+            <h1 className="text-4xl font-bold text-blue-600 mb-2">낚시 일지</h1>
             <p className="text-gray-600">나의 낚시 기록을 확인해보세요</p>
           </div>
           <button
             onClick={() => navigate('/fish/logs/write')}
             className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center space-x-2"
           >
-            <span>✏️</span>
             <span>일지 작성</span>
           </button>
         </div>
@@ -275,7 +274,7 @@ const FishLogsPage: React.FC = () => {
 
         {fishLogs.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
-            <div className="text-6xl mb-4">🎣</div>
+            <div className="text-6xl mb-4"></div>
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               {selectedFish ? '해당 물고기의 일지가 없습니다' : '아직 낚시 일지가 없습니다'}
             </h2>
@@ -306,7 +305,7 @@ const FishLogsPage: React.FC = () => {
                         target.parentElement!.innerHTML = `
                           <div class="w-full h-full flex items-center justify-center bg-gray-200">
                             <div class="text-center text-gray-500">
-                              <div class="text-4xl mb-2">🐟</div>
+                              <div class="text-4xl mb-2"></div>
                               <div class="text-sm">이미지를 불러올 수 없습니다</div>
                             </div>
                           </div>
@@ -317,7 +316,7 @@ const FishLogsPage: React.FC = () => {
                 ) : (
                   <div className="h-48 bg-gray-200 flex items-center justify-center">
                     <div className="text-center text-gray-500">
-                      <div className="text-4xl mb-2">📷</div>
+                      <div className="text-4xl mb-2"></div>
                       <div className="text-sm">사진 없음</div>
                     </div>
                   </div>
@@ -359,7 +358,6 @@ const FishLogsPage: React.FC = () => {
                           </>
                         ) : (
                           <>
-                            <span>🏆</span>
                             <span>랭킹 등록</span>
                           </>
                         )}

@@ -3,12 +3,15 @@ from pathlib import Path
 
 # 프로젝트 루트 경로
 BASE_DIR = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = BASE_DIR.parent
 
-# 모델 설정
-MODEL_PATH = BASE_DIR / "remove_tensorflow_cnn.h5"
+# 모델 설정 (도커 환경에서는 /app/best_model2.h5, 로컬에서는 상위 디렉토리)
+DOCKER_MODEL_PATH = Path("/app/best_model2.h5")
+LOCAL_MODEL_PATH = PROJECT_ROOT / "best_model2.h5"
+MODEL_PATH = DOCKER_MODEL_PATH if DOCKER_MODEL_PATH.exists() else LOCAL_MODEL_PATH
 MODEL_CLASSES = [
-    "가자미", "고등어", "농어", "대구", "도미", 
-    "민어", "삼치", "연어", "우럭", "참돔"
+    '감성돔', '고등어', '넙치', '농어', '도다리',
+    '돌돔', '숭어', '우럭', '전갱이', '참돔'
 ]
 
 # API 설정
@@ -24,7 +27,7 @@ DEBUG = True
 # 이미지 처리 설정
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "bmp"}
-IMAGE_SIZE = (224, 224)
+IMAGE_SIZE = (128, 128)
 
 # CORS 설정
 CORS_ORIGINS = [

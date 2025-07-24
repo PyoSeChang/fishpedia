@@ -126,7 +126,7 @@ const CommunityPage: React.FC = () => {
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-blue-600 mb-4">💬 커뮤니티</h1>
+        <h1 className="text-3xl font-bold text-blue-600 mb-4"> 커뮤니티</h1>
         <p className="text-gray-600 mb-6">
           다른 낚시꾼들과 이야기를 나누고 랭킹을 확인하세요
         </p>
@@ -171,7 +171,7 @@ const CommunityPage: React.FC = () => {
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
           }`}
         >
-          🏆 랭킹
+           랭킹
         </button>
       </div>
 
@@ -182,7 +182,7 @@ const CommunityPage: React.FC = () => {
           <div className="mb-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
               <p className="text-sm text-blue-800">
-                💡 <strong>검색 팁:</strong> #태그를 입력하고 스페이스를 누르면 태그로 변환됩니다! 
+                 <strong>검색 팁:</strong> #태그를 입력하고 스페이스를 누르면 태그로 변환됩니다! 
                 여러 태그를 입력하면 OR 검색 (하나라도 일치하면 검색됨)
                 <br />
                 예: <code className="bg-blue-100 px-1 rounded">#바다낚시</code> + 스페이스 → 태그로 변환
@@ -281,7 +281,7 @@ const RankingNav: React.FC<RankingNavProps> = ({
             }`}
             onClick={() => setRankingType('fisher')}
           >
-            🎣 낚시꾼 랭킹
+             낚시꾼 랭킹
           </button>
           <button
             className={`px-4 py-2 rounded-lg font-semibold border transition-colors ${
@@ -291,7 +291,7 @@ const RankingNav: React.FC<RankingNavProps> = ({
             }`}
             onClick={() => setRankingType('fish')}
           >
-            🐟 물고기 랭킹
+             물고기 랭킹
           </button>
         </div>
         
@@ -337,7 +337,7 @@ const RankingList: React.FC<RankingListProps> = ({
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="text-center text-gray-400">
-          <div className="text-4xl mb-2">📊</div>
+          <div className="text-4xl mb-2"></div>
           랭킹 데이터가 없습니다.
         </div>
       </div>
@@ -362,7 +362,7 @@ const RankingList: React.FC<RankingListProps> = ({
               <td className="py-3 px-2 font-bold">
                 {idx < 3 ? (
                   <span className="text-lg">
-                    {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}
+                    {idx === 0 ? '' : idx === 1 ? '' : ''}
                   </span>
                 ) : (
                   idx + 1

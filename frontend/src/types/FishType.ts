@@ -14,80 +14,80 @@ export interface FishType {
 export const FISH_TYPES: FishType[] = [
   {
     id: 1,
-    name: "가자미",
-    iconPath: "/icons/fish/flounder.png",
-    avgLength: 25.0,
-    stdDeviation: 5.0,
-    rarityScore: 22
+    name: "감성돔",
+    iconPath: "/물고기_이미지/감성돔.png",
+    avgLength: 28.0,
+    stdDeviation: 5.5,
+    rarityScore: 35
   },
   {
     id: 2,
     name: "고등어",
-    iconPath: "/icons/fish/mackerel.png",
+    iconPath: "/물고기_이미지/고등어.png",
     avgLength: 22.0,
     stdDeviation: 4.5,
     rarityScore: 18
   },
   {
     id: 3,
+    name: "넙치",
+    iconPath: "/물고기_이미지/넙치.png",
+    avgLength: 25.0,
+    stdDeviation: 5.0,
+    rarityScore: 22
+  },
+  {
+    id: 4,
     name: "농어",
-    iconPath: "/icons/fish/sea-bass.png",
+    iconPath: "/물고기_이미지/농어.png",
     avgLength: 30.0,
     stdDeviation: 6.0,
     rarityScore: 30
   },
   {
-    id: 4,
-    name: "대구",
-    iconPath: "/icons/fish/cod.png",
-    avgLength: 35.0,
-    stdDeviation: 7.0,
-    rarityScore: 28
-  },
-  {
     id: 5,
-    name: "도미",
-    iconPath: "/icons/fish/sea-bream.png",
-    avgLength: 26.0,
-    stdDeviation: 5.5,
-    rarityScore: 32
+    name: "도다리",
+    iconPath: "/물고기_이미지/도다리.png",
+    avgLength: 20.0,
+    stdDeviation: 4.0,
+    rarityScore: 25
   },
   {
     id: 6,
-    name: "민어",
-    iconPath: "/icons/fish/brown-croaker.png",
-    avgLength: 28.0,
-    stdDeviation: 6.0,
-    rarityScore: 35
+    name: "돌돔",
+    iconPath: "/물고기_이미지/돌돔.png",
+    avgLength: 32.0,
+    stdDeviation: 6.5,
+    rarityScore: 40
   },
   {
     id: 7,
-    name: "삼치",
-    iconPath: "/icons/fish/spanish-mackerel.png",
-    avgLength: 40.0,
-    stdDeviation: 8.0,
-    rarityScore: 38
+    name: "숭어",
+    iconPath: "/물고기_이미지/숭어.png",
+    avgLength: 24.0,
+    stdDeviation: 5.0,
+    rarityScore: 20
   },
   {
     id: 8,
-    name: "연어",
-    iconPath: "/icons/fish/salmon.png",
-    avgLength: 45.0,
-    stdDeviation: 9.0,
-    rarityScore: 45
-  },
-  {
-    id: 9,
     name: "우럭",
-    iconPath: "/icons/fish/rockfish.png",
+    iconPath: "/물고기_이미지/우럭.png",
     avgLength: 18.0,
     stdDeviation: 3.5,
     rarityScore: 20
   },
   {
+    id: 9,
+    name: "전갱이",
+    iconPath: "/물고기_이미지/전갱이.png",
+    avgLength: 16.0,
+    stdDeviation: 3.0,
+    rarityScore: 15
+  },
+  {
     id: 10,
     name: "참돔",
-    iconPath: "/icons/fish/red-snapper.png",
+    iconPath: "/물고기_이미지/참돔.png",
     avgLength: 28.0,
     stdDeviation: 5.5,
     rarityScore: 40

@@ -48,6 +48,8 @@ secrets.*
 fastApi/*.pth
 fastApi/__pycache__/
 fastApi/.env
+fastApi/venv/
+fastApi/venv39/
 
 ### STS ###
 .apt_generated

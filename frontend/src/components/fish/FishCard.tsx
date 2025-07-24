@@ -24,7 +24,7 @@ const FishCard: React.FC<FishCardProps> = ({ fish }) => {
           ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white' 
           : 'bg-gray-200 text-gray-600'
       }`}>
-        <div className="text-4xl mb-2">🐟</div>
+        <div className="text-4xl mb-2"></div>
         <h3 className="text-xl font-bold">{fish.name}</h3>
         <div className="text-sm opacity-80">
           평균 길이: {fish.avgLength}cm
@@ -49,13 +49,13 @@ const FishCard: React.FC<FishCardProps> = ({ fish }) => {
             </div>
             <div className="mt-4">
               <span className="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                ✅ 수집 완료
+                 수집 완료
               </span>
             </div>
           </>
         ) : (
           <div className="text-center py-4">
-            <div className="text-gray-400 mb-2">❓</div>
+            <div className="text-gray-400 mb-2"></div>
             <p className="text-gray-500">아직 수집하지 않은 물고기입니다</p>
             <p className="text-sm text-gray-400 mt-1">
               낚시해서 수집해보세요!

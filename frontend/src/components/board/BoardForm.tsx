@@ -394,7 +394,7 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images, onImageDescriptio
       {/* 헤더 */}
       <div className="text-center mb-4">
         <h3 className="text-lg font-medium text-gray-700">
-          📷 업로드된 이미지 ({currentIndex + 1}/{images.length})
+           업로드된 이미지 ({currentIndex + 1}/{images.length})
         </h3>
       </div>
 

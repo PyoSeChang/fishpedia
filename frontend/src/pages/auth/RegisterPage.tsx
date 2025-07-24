@@ -53,7 +53,7 @@ const RegisterPage: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="text-6xl mb-4">🎣</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-3xl font-bold text-blue-600">Fishipedia</h2>
           <p className="mt-2 text-gray-600">낚시 커뮤니티에 가입하세요</p>
         </div>

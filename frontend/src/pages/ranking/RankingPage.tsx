@@ -62,7 +62,7 @@ const RankingPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto py-10 px-4 space-y-8">
-      <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">🏆 랭킹</h1>
+      <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center"> 랭킹</h1>
       <RankingNav
         viewMode={viewMode}
         setViewMode={setViewMode}
@@ -99,7 +99,7 @@ const RankingNav: React.FC<RankingNavProps> = ({ viewMode, setViewMode, selected
             }`}
             onClick={() => setViewMode('fisher')}
           >
-            🎣 낚시꾼 랭킹
+             낚시꾼 랭킹
           </button>
           <button
             className={`px-4 py-2 rounded-lg font-semibold border transition-colors ${
@@ -109,7 +109,7 @@ const RankingNav: React.FC<RankingNavProps> = ({ viewMode, setViewMode, selected
             }`}
             onClick={() => setViewMode('fish')}
           >
-            🐟 물고기 랭킹
+             물고기 랭킹
           </button>
         </div>
         
@@ -149,7 +149,7 @@ const RankingList: React.FC<RankingListProps> = ({ viewMode, selectedFish, ranki
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="text-center text-gray-400">
-          <div className="text-4xl mb-2">📊</div>
+          <div className="text-4xl mb-2"></div>
           랭킹 데이터가 없습니다.
         </div>
       </div>
@@ -174,7 +174,7 @@ const RankingList: React.FC<RankingListProps> = ({ viewMode, selectedFish, ranki
               <td className="py-3 px-2 font-bold">
                 {idx < 3 ? (
                   <span className="text-lg">
-                    {idx === 0 ? '🥇' : idx === 1 ? '🥈' : '🥉'}
+                    {idx === 0 ? '' : idx === 1 ? '' : ''}
                   </span>
                 ) : (
                   idx + 1

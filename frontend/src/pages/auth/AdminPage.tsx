@@ -111,7 +111,7 @@ const AdminPage: React.FC = () => {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold text-blue-600 mb-4">⚙️ 관리자 페이지</h1>
+        <h1 className="text-4xl font-bold text-blue-600 mb-4"> 관리자 페이지</h1>
         <p className="text-gray-600 text-lg">물고기 정보를 관리하세요</p>
       </div>
 
@@ -124,13 +124,13 @@ const AdminPage: React.FC = () => {
               onClick={handleAddFish}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
-              ➕ 물고기 추가
+               물고기 추가
             </button>
             <button 
               onClick={handleFishingForecast}
               className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
             >
-              🎣 낚시 예보 조회
+               낚시 예보 조회
             </button>
           </div>
         </div>

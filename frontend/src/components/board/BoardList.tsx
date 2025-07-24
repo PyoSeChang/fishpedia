@@ -134,7 +134,7 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTi
                     {getCategoryLabel(board.category)}
                   </span>
                   {board.pinned && (
-                    <span className="ml-1 text-red-500">📌</span>
+                    <span className="ml-1 text-red-500"></span>
                   )}
                 </td>
                 <td className="px-6 py-4">

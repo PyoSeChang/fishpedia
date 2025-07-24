@@ -7,15 +7,23 @@ interface ClassificationResult {
   }>;
 }
 
-const FASTAPI_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
 export const classificationService = {
   classifyFish: async (imageFile: File): Promise<ClassificationResult> => {
     const formData = new FormData();
     formData.append('file', imageFile);
 
-    const response = await fetch(`${FASTAPI_BASE_URL}/predict`, {
+    // JWT 토큰 가져오기 (선택적)
+    const token = localStorage.getItem('accessToken');
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/fish/classification/predict`, {
       method: 'POST',
+      headers,
       body: formData,
     });
 
@@ -28,10 +36,30 @@ export const classificationService = {
   },
 
   checkHealth: async (): Promise<{ status: string; model_loaded: boolean }> => {
-    const response = await fetch(`${FASTAPI_BASE_URL}/health`);
+    const response = await fetch(`${API_BASE_URL}/api/fish/classification/health`);
     
     if (!response.ok) {
-      throw new Error('FastAPI 서버 상태 확인 실패');
+      throw new Error('분류 서버 상태 확인 실패');
+    }
+
+    return response.json();
+  },
+
+  // 분류 저장소 관련 API 추가
+  getClassificationStats: async () => {
+    const token = localStorage.getItem('accessToken');
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/classification/storage/summary`, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error('분류 통계 조회 실패');
     }
 
     return response.json();

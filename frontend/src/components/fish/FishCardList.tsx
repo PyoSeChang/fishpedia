@@ -16,7 +16,7 @@ const FishCardList: React.FC<FishCardListProps> = ({ fishData }) => {
         <div key={fish.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="text-2xl">🐟</div>
+              <div className="text-2xl"></div>
               <div>
                 <h3 className="font-semibold text-lg text-blue-600">{fish.name}</h3>
                 <p className="text-gray-600">
