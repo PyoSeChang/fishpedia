@@ -50,7 +50,7 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
+    <div className="flex items-center justify-center min-h-[80vh]">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="text-6xl mb-4"></div>

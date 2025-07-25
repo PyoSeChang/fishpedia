@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fishiphedia.common.service.FileUploadService;
 import com.fishiphedia.fish.dto.FishRequest;
 import com.fishiphedia.fish.dto.FishResponse;
+import com.fishiphedia.fish.dto.FishAverageScoreResponse;
 import com.fishiphedia.fish.service.FishService;
 import com.fishiphedia.fish.service.FastApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -235,6 +236,27 @@ public class FishController {
         } catch (Exception e) {
             log.error("FastAPI 상태 확인 중 오류 발생", e);
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    // 어종별 평균 점수 조회
+    @GetMapping("/{fishId}/average-score")
+    @Operation(summary = "어종별 평균 점수 조회", description = "특정 어종의 평균 점수를 조회합니다.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "평균 점수 조회 성공"),
+        @ApiResponse(responseCode = "404", description = "물고기를 찾을 수 없음"),
+        @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    public ResponseEntity<FishAverageScoreResponse> getAverageScore(@PathVariable Long fishId) {
+        try {
+            FishAverageScoreResponse response = fishService.getAverageScore(fishId);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            log.error("평균 점수 조회 실패 - fishId: {}, error: {}", fishId, e.getMessage());
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            log.error("평균 점수 조회 중 오류 발생 - fishId: {}", fishId, e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 } 

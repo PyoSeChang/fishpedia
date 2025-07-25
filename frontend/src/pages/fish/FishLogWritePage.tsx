@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { fishService, FishLogCreateResponse, LevelUpdateResult } from '../../services/fishService';
 
 import FishSelector from '../../components/common/FishSelector';
+import FishClassifier from '../../components/fish/FishClassifier';
 
 const FishLogWritePage: React.FC = () => {
   const navigate = useNavigate();
@@ -18,11 +19,15 @@ const FishLogWritePage: React.FC = () => {
   const [isCalculatingScore, setIsCalculatingScore] = useState(false);
   const [scoreCalculationError, setScoreCalculationError] = useState<string>('');
   const [classificationLogId, setClassificationLogId] = useState<number | null>(null);
+  const [showClassifier, setShowClassifier] = useState(false);
+  const [averageScore, setAverageScore] = useState<number | null>(null);
+  const [isLoadingAverageScore, setIsLoadingAverageScore] = useState(false);
 
   // URL 파라미터에서 fishId와 classificationLogId를 받아서 자동 선택
   useEffect(() => {
     const fishId = searchParams.get('fishId');
     const logId = searchParams.get('classificationLogId');
+    const fromClassifier = searchParams.get('fromClassifier');
     
     if (fishId) {
       const fishIdNumber = parseInt(fishId, 10);
@@ -39,7 +44,56 @@ const FishLogWritePage: React.FC = () => {
         console.log(`분류 로그 ID 설정: classificationLogId=${logIdNumber}`);
       }
     }
+
+    // Classifier에서 온 경우 이미지 자동 로드
+    if (fromClassifier === 'true') {
+      const imageData = sessionStorage.getItem('classifierImage');
+      const imageName = sessionStorage.getItem('classifierImageName');
+      const imageType = sessionStorage.getItem('classifierImageType');
+      
+      if (imageData && imageName && imageType) {
+        // Base64 데이터를 File 객체로 변환
+        fetch(imageData)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], imageName, { type: imageType });
+            setSelectedImage(file);
+            setImagePreview(imageData);
+            console.log('Classifier 이미지 자동 로드 완료');
+            
+            // 세션 스토리지에서 이미지 데이터 제거
+            sessionStorage.removeItem('classifierImage');
+            sessionStorage.removeItem('classifierImageName');
+            sessionStorage.removeItem('classifierImageType');
+          })
+          .catch(error => {
+            console.error('이미지 로드 실패:', error);
+          });
+      }
+    }
   }, [searchParams]);
+
+  // Load average score when fish is selected
+  useEffect(() => {
+    const loadAverageScore = async () => {
+      if (selectedFish && typeof selectedFish === 'number') {
+        setIsLoadingAverageScore(true);
+        try {
+          const avgScore = await fishService.getAverageScore(selectedFish);
+          setAverageScore(avgScore);
+        } catch (error) {
+          console.error('Failed to load average score:', error);
+          setAverageScore(null);
+        } finally {
+          setIsLoadingAverageScore(false);
+        }
+      } else {
+        setAverageScore(null);
+      }
+    };
+
+    loadAverageScore();
+  }, [selectedFish]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -52,6 +106,29 @@ const FishLogWritePage: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  // Handler for fish classification AI
+  const handleClassifierSelection = (fishId: number, classificationLogId?: number, imageFile?: File) => {
+    setSelectedFish(fishId);
+    if (classificationLogId) {
+      setClassificationLogId(classificationLogId);
+    }
+    if (imageFile) {
+      setSelectedImage(imageFile);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(imageFile);
+    }
+    setShowClassifier(false);
+  };
+
+  const handleLoginPrompt = () => {
+    navigate('/auth/login');
+  };
+
+  const isAuthenticated = !!localStorage.getItem('accessToken');
 
   // 점수 계산 버튼 활성화 조건
   const isScoreButtonEnabled = () => {
@@ -165,6 +242,16 @@ const FishLogWritePage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 물고기 종류 *
               </label>
+              <div className="mb-3">
+                <button
+                  type="button"
+                  onClick={() => setShowClassifier(true)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                >
+                  <span>🤖</span>
+                  <span>물고기 종류를 모르시겠다면? 어종 분류 AI 활용하기</span>
+                </button>
+              </div>
               <FishSelector
                 value={selectedFish}
                 onChange={setSelectedFish}
@@ -188,6 +275,32 @@ const FishLogWritePage: React.FC = () => {
                 required
               />
             </div>
+
+            {/* 해당 어종 평균 점수 섹션 */}
+            {selectedFish && typeof selectedFish === 'number' && (
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-blue-700">
+                    해당 어종 평균 점수
+                  </label>
+                  {isLoadingAverageScore ? (
+                    <span className="flex items-center space-x-2 text-blue-600">
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                      <span className="text-sm">로딩 중...</span>
+                    </span>
+                  ) : averageScore !== null ? (
+                    <span className="text-lg font-bold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                      {averageScore}점
+                    </span>
+                  ) : (
+                    <span className="text-sm text-blue-600">평균 점수 없음</span>
+                  )}
+                </div>
+                <p className="text-xs text-blue-600">
+                  다른 사용자들이 이 어종으로 받은 평균 점수입니다.
+                </p>
+              </div>
+            )}
 
             {/* 점수 계산 섹션 (폼과 분리) */}
             <div className="bg-gray-50 p-4 rounded-lg border-2 border-dashed border-gray-300">
@@ -264,6 +377,13 @@ const FishLogWritePage: React.FC = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 사진 업로드 (선택사항)
               </label>
+              {searchParams.get('fromClassifier') === 'true' && selectedImage && (
+                <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-700">
+                    🤖 AI 분류기에서 분석한 이미지가 자동으로 업로드되었습니다.
+                  </p>
+                </div>
+              )}
               <input
                 type="file"
                 accept="image/*"
@@ -277,6 +397,11 @@ const FishLogWritePage: React.FC = () => {
                     alt="미리보기"
                     className="w-32 h-32 object-cover rounded-lg border"
                   />
+                  {searchParams.get('fromClassifier') === 'true' && (
+                    <p className="text-xs text-green-600 mt-1">
+                      AI 분류기에서 가져온 이미지
+                    </p>
+                  )}
                 </div>
               )}
             </div>
@@ -303,6 +428,30 @@ const FishLogWritePage: React.FC = () => {
           </form>
         </div>
       </div>
+
+      {/* AI 분류기 모달 */}
+      {showClassifier && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800">AI 물고기 분류기</h2>
+              <button
+                onClick={() => setShowClassifier(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <FishClassifier
+                isAuthenticated={isAuthenticated}
+                onLoginPrompt={handleLoginPrompt}
+                onFishSelected={handleClassifierSelection}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -3,10 +3,8 @@ import BoardDetail from '../../components/board/BoardDetail';
 
 const BoardDetailPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 py-6">
-      <div className="max-w-6xl mx-auto px-6">
-        <BoardDetail />
-      </div>
+    <div className="w-full" style={{maxWidth: '1200px', margin: '0 auto'}}>
+      <BoardDetail />
     </div>
   );
 };

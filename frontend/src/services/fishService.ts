@@ -75,6 +75,14 @@ export interface ScoreCalculationResult {
   source: string;
 }
 
+export interface FishAverageScoreResponse {
+  fishId: number;
+  fishName: string;
+  averageScore: number | null;
+  totalLogs: number;
+  message: string;
+}
+
 export const fishService = {
   // 물고기 목록 조회
   async getAllFish(): Promise<Fish[]> {
@@ -221,5 +229,17 @@ export const fishService = {
   async verifyFishLog(fishLogId: number): Promise<boolean> {
     const response = await api.post(`/fish/logs/${fishLogId}/verify`);
     return response.data;
+  },
+
+  // 어종별 평균 점수 조회
+  async getAverageScore(fishId: number): Promise<number | null> {
+    try {
+      const response = await api.get(`/fish/${fishId}/average-score`);
+      const data: FishAverageScoreResponse = response.data;
+      return data.averageScore;
+    } catch (error) {
+      console.error('Failed to get average score:', error);
+      return null;
+    }
   }
 }; 

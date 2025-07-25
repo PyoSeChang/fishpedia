@@ -9,7 +9,7 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <span className="text-2xl"></span>
-              <span className="font-bold text-xl">Fishipedia</span>
+              <span className="font-bold text-xl">아가미 아카이브</span>
             </div>
             <p className="text-blue-100">
               낚시 기록과 도감 수집을 통한 즐거운 낚시 커뮤니티
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">연락처</h3>
             <div className="space-y-2 text-blue-100">
-              <p> support@fishipedia.com</p>
+              <p> support@아가미아카이브.com</p>
               <p> 010-1234-5678</p>
               <p> 서울특별시 강남구</p>
             </div>
@@ -39,11 +39,11 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="border-t border-blue-700 mt-8 pt-8 text-center text-blue-100">
-          <p>&copy; 2024 Fishipedia. All rights reserved.</p>
+          <p>&copy; 2024 아가미 아카이브. All rights reserved.</p>
         </div>
       </div>
     </footer>
   );
 };
 
-export default Footer; 
+export default Footer;

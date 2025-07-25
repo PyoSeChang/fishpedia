@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fishService, Fish, FishRequest } from '../../services/fishService';
+import UseCaseDiagram from '../../components/admin/UseCaseDiagram';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
@@ -114,6 +115,9 @@ const AdminPage: React.FC = () => {
         <h1 className="text-4xl font-bold text-blue-600 mb-4"> 관리자 페이지</h1>
         <p className="text-gray-600 text-lg">물고기 정보를 관리하세요</p>
       </div>
+
+      {/* UseCase Diagram */}
+      <UseCaseDiagram />
 
       {/* 관리자 기능 버튼 */}
       <div className="bg-white p-6 rounded-xl shadow-lg">

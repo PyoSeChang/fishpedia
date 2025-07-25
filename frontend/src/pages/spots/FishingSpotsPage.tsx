@@ -503,7 +503,6 @@ const FishingSpotsPage: React.FC = () => {
           <div className="flex items-center gap-3 mb-3">
             <span className="text-lg"></span>
             <h3 className="text-lg font-semibold text-blue-800">지역 선택</h3>
-            <span className="text-sm text-blue-600">성능 최적화를 위해 지역을 먼저 선택해주세요</span>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-6 lg:grid-cols-9 gap-2">
             {[

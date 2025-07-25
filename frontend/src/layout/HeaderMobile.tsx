@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { getLoginIdFromToken } from '../utils/jwtUtils';
+import { userService } from '../services/userService';
 
 interface HeaderMobileProps {
   isLoggedIn: boolean;
   loginId: string;
+  userName: string;
   userRole: string;
   onLogout: () => void;
   navItems: Array<{ path: string; label: string; icon: string }>;
@@ -12,12 +15,14 @@ interface HeaderMobileProps {
 const HeaderMobile: React.FC<HeaderMobileProps> = ({
   isLoggedIn,
   loginId,
+  userName,
   userRole,
   onLogout,
   navItems
 }) => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [displayName, setDisplayName] = useState<string>('');
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -26,6 +31,32 @@ const HeaderMobile: React.FC<HeaderMobileProps> = ({
   const closeMenu = () => {
     setIsMenuOpen(false);
   };
+
+  useEffect(() => {
+    const fetchUserNameFromToken = async () => {
+      if (isLoggedIn) {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          try {
+            const tokenLoginId = getLoginIdFromToken(token);
+            if (tokenLoginId) {
+              const userInfo = await userService.getMyInfo();
+              setDisplayName(userInfo.name);
+            } else {
+              setDisplayName(userName || loginId);
+            }
+          } catch (error) {
+            console.error('사용자 정보 조회 실패:', error);
+            setDisplayName(userName || loginId);
+          }
+        } else {
+          setDisplayName(userName || loginId);
+        }
+      }
+    };
+
+    fetchUserNameFromToken();
+  }, [isLoggedIn, userName, loginId]);
 
   return (
     <>
@@ -54,14 +85,13 @@ const HeaderMobile: React.FC<HeaderMobileProps> = ({
 
             {/* 로고 */}
             <Link to="/" className="flex items-center space-x-2" onClick={closeMenu}>
-              <span className="text-2xl">🐟</span>
-              <span className="text-white font-bold text-lg">Fishipedia</span>
+              <span className="text-white font-bold text-lg">아가미 아카이브</span>
             </Link>
 
             {/* 로그인 상태 표시 (간단히) */}
             <div className="text-white text-sm">
               {isLoggedIn ? (
-                <span className="truncate max-w-20">{loginId}</span>
+                <span className="truncate max-w-20">{displayName || loginId}</span>
               ) : (
                 <Link
                   to="/auth/login"
@@ -94,8 +124,7 @@ const HeaderMobile: React.FC<HeaderMobileProps> = ({
         <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl">🐟</span>
-              <span className="text-white font-bold text-lg">Fishipedia</span>
+              <span className="text-white font-bold text-lg">아가미 아카이브</span>
             </div>
             <button
               onClick={closeMenu}
@@ -121,7 +150,7 @@ const HeaderMobile: React.FC<HeaderMobileProps> = ({
           {isLoggedIn && (
             <div className="mt-4 text-white">
               <p className="text-sm opacity-90">안녕하세요!</p>
-              <p className="font-semibold">{loginId}님</p>
+              <p className="font-semibold">{displayName || loginId}님</p>
             </div>
           )}
         </div>

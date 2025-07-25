@@ -2,6 +2,7 @@ package com.fishiphedia.fish.service;
 
 import com.fishiphedia.fish.dto.FishRequest;
 import com.fishiphedia.fish.dto.FishResponse;
+import com.fishiphedia.fish.dto.FishAverageScoreResponse;
 import com.fishiphedia.fish.entity.Fish;
 
 import java.util.List;
@@ -28,4 +29,7 @@ public interface FishService {
     
     // 이름으로 물고기 조회
     Fish findByName(String name);
+    
+    // 어종별 평균 점수 조회
+    FishAverageScoreResponse getAverageScore(Long fishId);
 } 

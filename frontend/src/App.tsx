@@ -27,6 +27,7 @@ function App() {
     <Router>
       <div className="App min-h-screen bg-gradient-to-br from-blue-50 to-cyan-50">
         <Routes>
+          <Route path="admin" element={<AdminPage />} />
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
             <Route path="fish">
@@ -56,15 +57,15 @@ function App() {
               <Route index element={<ProfilePage />} />
               <Route path="edit" element={<ProfileEditPage />} />
             </Route>
-            <Route path="admin" element={<AdminPage />} />
+
           </Route>
-          <Route path="/auth">
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="forgot-password" element={<ForgotPasswordPage />} />
-          </Route>
-          <Route path="/oauth/callback/kakao" element={<KakaoCallbackPage />} />
-          <Route path="/oauth/callback/naver" element={<NaverCallbackPage />} />
+            <Route path="auth">
+              <Route path="login" element={<LoginPage />} />
+              <Route path="register" element={<RegisterPage />} />
+              <Route path="forgot-password" element={<ForgotPasswordPage />} />
+            </Route>
+            <Route path="oauth/callback/kakao" element={<KakaoCallbackPage />} />
+            <Route path="oauth/callback/naver" element={<NaverCallbackPage />} />
         </Routes>
       </div>
     </Router>

@@ -21,7 +21,9 @@
       "Bash(grep:*)",
       "Bash(pip3 install:*)",
       "Bash(npx tsc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(pkill:*)",
+      "Bash(true)"
     ],
     "deny": []
   }

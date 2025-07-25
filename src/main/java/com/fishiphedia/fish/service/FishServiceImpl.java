@@ -2,10 +2,13 @@ package com.fishiphedia.fish.service;
 
 import com.fishiphedia.fish.dto.FishRequest;
 import com.fishiphedia.fish.dto.FishResponse;
+import com.fishiphedia.fish.dto.FishAverageScoreResponse;
 import com.fishiphedia.fish.entity.Fish;
 import com.fishiphedia.fish.entity.FishCollection;
+import com.fishiphedia.fish.entity.FishLog;
 import com.fishiphedia.fish.repository.FishRepository;
 import com.fishiphedia.fish.repository.FishCollectionRepository;
+import com.fishiphedia.fish.repository.FishLogRepository;
 import com.fishiphedia.user.entity.User;
 import com.fishiphedia.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +25,7 @@ public class FishServiceImpl implements FishService {
 
     private final FishRepository fishRepository;
     private final FishCollectionRepository fishCollectionRepository;
+    private final FishLogRepository fishLogRepository;
     private final UserRepository userRepository;
 
     @Override
@@ -109,6 +113,43 @@ public class FishServiceImpl implements FishService {
     @Override
     public Fish findByName(String name) {
         return fishRepository.findByName(name).orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FishAverageScoreResponse getAverageScore(Long fishId) {
+        // 물고기 존재 여부 확인
+        Fish fish = fishRepository.findById(fishId)
+                .orElseThrow(() -> new RuntimeException("물고기를 찾을 수 없습니다."));
+
+        // 해당 어종의 모든 낚시 일지 조회
+        List<FishLog> fishLogs = fishLogRepository.findAll().stream()
+                .filter(log -> log.getFish().getId().equals(fishId))
+                .collect(Collectors.toList());
+
+        if (fishLogs.isEmpty()) {
+            return FishAverageScoreResponse.builder()
+                    .fishId(fishId)
+                    .fishName(fish.getName())
+                    .averageScore(null)
+                    .totalLogs(0)
+                    .message("해당 어종의 낚시 기록이 없습니다.")
+                    .build();
+        }
+
+        // 평균 점수 계산
+        double averageScore = fishLogs.stream()
+                .mapToInt(FishLog::getScore)
+                .average()
+                .orElse(0.0);
+
+        return FishAverageScoreResponse.builder()
+                .fishId(fishId)
+                .fishName(fish.getName())
+                .averageScore(Math.round(averageScore * 10.0) / 10.0) // 소수점 첫째 자리까지
+                .totalLogs(fishLogs.size())
+                .message("평균 점수가 계산되었습니다.")
+                .build();
     }
 
     private FishResponse convertToResponse(Fish fish) {

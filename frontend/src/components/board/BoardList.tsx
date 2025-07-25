@@ -79,13 +79,30 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTi
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const now = new Date();
+    const diffTime = now.getTime() - date.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return date.toLocaleTimeString('ko-KR', { 
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: false
+      });
+    } else if (diffDays < 7) {
+      return `${diffDays}일 전`;
+    } else if (date.getFullYear() === now.getFullYear()) {
+      return date.toLocaleDateString('ko-KR', {
+        month: '2-digit',
+        day: '2-digit'
+      });
+    } else {
+      return date.toLocaleDateString('ko-KR', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
   };
 
   if (loading) return <div className="text-center py-8">로딩 중...</div>;
@@ -105,19 +122,19 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTi
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 분류
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 제목
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-24 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 작성자
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-20 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 작성일
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="w-16 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 조회수
               </th>
             </tr>
@@ -125,7 +142,7 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTi
           <tbody className="bg-white divide-y divide-gray-200">
             {boards.map((board) => (
               <tr key={board.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="w-24 px-4 py-4 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                     board.category === BoardCategory.NOTICE 
                       ? 'bg-red-100 text-red-800'
@@ -134,10 +151,10 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTi
                     {getCategoryLabel(board.category)}
                   </span>
                   {board.pinned && (
-                    <span className="ml-1 text-red-500"></span>
+                    <span className="ml-1 text-red-500">📌</span>
                   )}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 py-4">
                   <Link
                     to={`/board/${board.id}`}
                     className="text-gray-900 hover:text-blue-600 font-medium"
@@ -152,13 +169,13 @@ const BoardList: React.FC<BoardListProps> = ({ category, searchKeyword, searchTi
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="w-24 px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                   {board.authorName}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="w-20 px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                   {formatDate(board.createAt)}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="w-16 px-4 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                   {board.readCount}
                 </td>
               </tr>

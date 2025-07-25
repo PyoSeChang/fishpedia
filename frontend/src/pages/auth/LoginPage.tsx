@@ -56,7 +56,7 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
+    <div className="flex items-center justify-center min-h-[80vh]">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <div className="text-6xl mb-4"></div>
@@ -163,6 +163,7 @@ const LoginPage: React.FC = () => {
               </svg>
               카카오톡으로 로그인
             </a>
+            <div className="h-4"></div>
             {/* 네이버 로그인 버튼 */}
             <a
                 href={NAVER_AUTH_URL}
@@ -174,6 +175,7 @@ const LoginPage: React.FC = () => {
                   boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}
             >
+
               {/* 네이버 아이콘 (svg) */}
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 48 48">
                 <rect width="48" height="48" rx="12" fill="#03C75A"/>

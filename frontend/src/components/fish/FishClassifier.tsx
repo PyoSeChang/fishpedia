@@ -17,9 +17,10 @@ interface ClassificationResult {
 interface FishClassifierProps {
   isAuthenticated: boolean;
   onLoginPrompt: () => void;
+  onFishSelected?: (fishId: number, classificationLogId?: number, imageFile?: File) => void;
 }
 
-const FishClassifier: React.FC<FishClassifierProps> = ({ isAuthenticated, onLoginPrompt }) => {
+const FishClassifier: React.FC<FishClassifierProps> = ({ isAuthenticated, onLoginPrompt, onFishSelected }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -108,13 +109,41 @@ const FishClassifier: React.FC<FishClassifierProps> = ({ isAuthenticated, onLogi
       const fishType = getFishTypeByName(result.detectedFishName);
       if (fishType) {
         setShowFishModal(false);
-        const queryParams = new URLSearchParams({
-          fishId: fishType.id.toString(),
-        });
-        if (result.classificationLogId) {
-          queryParams.set('classificationLogId', result.classificationLogId.toString());
+        if (onFishSelected) {
+          // If we're in a modal context, call the callback with image file
+          onFishSelected(fishType.id, result.classificationLogId, selectedImage || undefined);
+        } else {
+          // If we're standalone, store image in sessionStorage and navigate
+          if (selectedImage) {
+            // Store image data for retrieval in write page
+            const reader = new FileReader();
+            reader.onload = (e) => {
+              if (e.target?.result) {
+                sessionStorage.setItem('classifierImage', e.target.result as string);
+                sessionStorage.setItem('classifierImageName', selectedImage.name);
+                sessionStorage.setItem('classifierImageType', selectedImage.type);
+              }
+              
+              const queryParams = new URLSearchParams({
+                fishId: fishType.id.toString(),
+                fromClassifier: 'true'
+              });
+              if (result.classificationLogId) {
+                queryParams.set('classificationLogId', result.classificationLogId.toString());
+              }
+              navigate(`/fish/logs/write?${queryParams.toString()}`);
+            };
+            reader.readAsDataURL(selectedImage);
+          } else {
+            const queryParams = new URLSearchParams({
+              fishId: fishType.id.toString(),
+            });
+            if (result.classificationLogId) {
+              queryParams.set('classificationLogId', result.classificationLogId.toString());
+            }
+            navigate(`/fish/logs/write?${queryParams.toString()}`);
+          }
         }
-        navigate(`/fish/logs/write?${queryParams.toString()}`);
       }
     }
   };

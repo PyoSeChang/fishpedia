@@ -295,7 +295,7 @@ const FishLogsPage: React.FC = () => {
                 {log.imgPath ? (
                   <div className="h-48 bg-gray-200 relative">
                     <img
-                      src={`http://localhost:8080${log.imgPath}`}
+                      src={`http://localhost:8081${log.imgPath}`}
                       alt={`${log.fishName} 사진`}
                       className="w-full h-full object-cover"
                       onError={(e) => {

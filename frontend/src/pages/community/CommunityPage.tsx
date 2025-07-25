@@ -351,7 +351,7 @@ const RankingList: React.FC<RankingListProps> = ({
           <tr className="bg-blue-50">
             <th className="py-3 px-2">순위</th>
             <th className="py-3 px-2">닉네임</th>
-            <th className="py-3 px-2">물고기</th>
+            {rankingType === 'fish' && <th className="py-3 px-2">물고기</th>}
             <th className="py-3 px-2">점수</th>
             {rankingType === 'fish' && <th className="py-3 px-2">최고 길이</th>}
           </tr>
@@ -360,16 +360,10 @@ const RankingList: React.FC<RankingListProps> = ({
           {ranking.map((item, idx) => (
             <tr key={idx} className="border-t hover:bg-gray-50 transition-colors">
               <td className="py-3 px-2 font-bold">
-                {idx < 3 ? (
-                  <span className="text-lg">
-                    {idx === 0 ? '' : idx === 1 ? '' : ''}
-                  </span>
-                ) : (
-                  idx + 1
-                )}
+                {idx + 1}
               </td>
               <td className="py-3 px-2 font-medium">{item.name}</td>
-              <td className="py-3 px-2">{item.fishName || '-'}</td>
+              {rankingType === 'fish' && <td className="py-3 px-2">{item.fishName || '-'}</td>}
               <td className="py-3 px-2 font-bold text-blue-600">
                 {rankingType === 'fisher' ? (item.totalScore ?? '-') : (item.highestScore ?? '-')}
               </td>
